@@ -10,5 +10,5 @@ library(patchwork)
 library(scuttle)
 
 # general paths
-absolute_path_urb <- "/data/PRTNR/CHUV/DIR/rgottar1/owkin_pilot/"
-absolute_path_cur <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/"
+# absolute_path_urb <- here::here()
+absolute_path_cur <- here::here()

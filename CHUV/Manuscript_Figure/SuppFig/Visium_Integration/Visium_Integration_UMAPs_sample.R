@@ -8,7 +8,13 @@ library(patchwork)
 # Helper ------------------------------------------------------------------
 read_and_plot <- function(savepath, save_rds_name){
   seu <- readRDS(paste0(savepath, save_rds_name))
-  p <- DimPlot(seu, label=TRUE, group.by="sample_id") + labs(y= "UMAP_2", x = "UMAP_1") + ggtitle("")
+  p <- DimPlot(seu, label=TRUE, group.by="sample_id", label.size = 8) + 
+    labs(y= "UMAP_2", x = "UMAP_1") + ggtitle("") + 
+    theme(axis.line = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text = element_blank(),
+          axis.title = element_blank(),
+          legend.text = element_text(size=15)) 
   return(p)
 }
 # p <- read_and_plot(savepath, save_rds_name)
@@ -64,12 +70,12 @@ for(disease in disease_list){
 }
 
 #########################################################################
-p_combined <- (p_breast_1 | p_lung_1 | p_dlbcl_1) /
-  (p_breast_2 | p_lung_2 | p_dlbcl_2) /
-  (p_breast_3 | p_lung_3 | p_dlbcl_3) /
-  (p_breast_4 | p_lung_4 | p_dlbcl_4)
+p_combined <- (p_breast_1 + theme(plot.margin = margin(0, 50, 50, 0)) | p_lung_1 + theme(plot.margin = margin(0, 50, 50, 50)) | p_dlbcl_1 + theme(plot.margin = margin(0, 0, 50, 50))) /
+  (p_breast_2 + theme(plot.margin = margin(0, 50, 50, 0)) | p_lung_2 + theme(plot.margin = margin(0, 50, 50, 50)) | p_dlbcl_2 + theme(plot.margin = margin(0, 0, 50, 50))) /
+  (p_breast_3 + theme(plot.margin = margin(0, 50, 50, 0)) | p_lung_3 + theme(plot.margin = margin(0, 50, 50, 50)) | p_dlbcl_3 + theme(plot.margin = margin(0, 0, 50, 50))) /
+  (p_breast_4 + theme(plot.margin = margin(0, 50, 0, 0)) | p_lung_4 + theme(plot.margin = margin(0, 50, 0, 50)) | p_dlbcl_4 + theme(plot.margin = margin(0, 0, 0, 50))) 
 
-figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig_Supp_Visium_Integration_UMAPs"
+figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/SuppFig/Visium_Integration_UMAP_Heatmap"
 pdf(file.path(figpath, "Visium_UMAP_Samples.pdf"), width = 26, height = 30)
 print(p_combined)
 dev.off()

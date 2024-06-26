@@ -29,8 +29,6 @@ FeaturePlot(seu, features = c("THBS1", "POSTN", "COL3A1", "COL1A2", "COL1A1"), n
 # Vessels
 FeaturePlot(seu, features = c("ACKR1", "MEOX2", "CCL14", "TSPAN7", "PLA1A", "VWF", "GIMAP4"), ncol = 4)
 
-
-
 # Tu_D1_LMO2
 FeaturePlot(seu, features = c("LMO2"))
 # Tu_D1_SMIM14
@@ -46,11 +44,6 @@ test3 <- test2 %>%
   group_by(Var2) %>%
   mutate(countT= sum(Freq)) %>%
   mutate(per=round(100*Freq/countT,0))
-
-## Does not really work
-# test4 <- test3 %>%
-#   group_by(Var2) %>%
-#   filter(per == max(per))
 
 library(tidyverse)
 test5 <- test3 %>%

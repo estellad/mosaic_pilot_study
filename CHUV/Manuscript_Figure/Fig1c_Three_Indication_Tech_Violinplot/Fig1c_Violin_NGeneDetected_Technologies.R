@@ -109,7 +109,7 @@ geo_plot <-
   plot_layout(heights = c(4, -0.95, 4, -0.95, 4))
 geo_plot
 
-pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/geo_ngenedetected_violin_bold_colorfacet.pdf",
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig1/Fig1c/geo_ngenedetected_violin_bold_colorfacet.pdf",
       # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/geo_ngenedetected_violin_bold.pdf",
       # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/geo_ngenedetected_violin.pdf",
     width = 3.3,
@@ -201,7 +201,7 @@ vis_plot <- (plot_violin_per_indication(plt_df_vis_breast, c("B1_2", "B1_4", "B2
   plot_layout(guides = "collect", heights = c(4, -0.95, 4, -0.95, 4))
 vis_plot
 
-pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/vis_ngenedetected_violin_bold_colorfacet.pdf",
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig1/Fig1c/vis_ngenedetected_violin_bold_colorfacet.pdf",
     # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/vis_ngenedetected_violin_bold.pdf",
     # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/vis_ngenedetected_violin.pdf",
     width = 3.3,
@@ -280,7 +280,7 @@ chrom_plot <- (plot_violin_per_indication(chrom_breast, c("B1", "B2", "B3", "B3_
   plot_layout(guides = "collect", heights = c(4, -0.95, 4, -0.95, 4))
 chrom_plot
 
-pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/chrom_ngenedetected_violin_bold_colorfacet.pdf", 
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig1/Fig1c/chrom_ngenedetected_violin_bold_colorfacet.pdf", 
     # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/chrom_ngenedetected_violin.pdf",
     width = 3.3,
     height = 7)
