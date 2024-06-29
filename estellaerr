@@ -1,0 +1,4 @@
+Warning: undefined directory for R libries; use /users/ydong2/R/rocker-rstudio
+Warning: virtual command will not be used for RStudio Server
+WARNING: Could not find any nv files on this host!
+slurmstepd: error: *** JOB 45186164 ON dna074 CANCELLED AT 2024-06-30T01:54:05 ***

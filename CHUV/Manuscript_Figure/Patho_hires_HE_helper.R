@@ -2,7 +2,7 @@ plotVisium_new <- function(spe, spots = TRUE, annotate = NULL, image = TRUE,
                            zoom = FALSE, show_axis = FALSE, assay = "counts", 
                            trans = "identity", legend.position = "right", 
                            x_coord = NULL, y_coord = NULL, y_reverse = TRUE, sample_ids = NULL, 
-                           image_ids = NULL, palette = NULL, pt.size = 1){
+                           image_ids = NULL, palette = NULL, pt.size = 1, guide.pt.size = 4){
   stopifnot(is(spe, "SpatialExperiment"), is.logical(spots), 
             length(spots) == 1, is.logical(image), length(image) == 
               1, is.logical(y_reverse), length(y_reverse) == 1)
@@ -65,9 +65,8 @@ plotVisium_new <- function(spe, spots = TRUE, annotate = NULL, image = TRUE,
       plt_df <- .y_reverse(plt_df, ix, y_coord, img)
   }
   if (spots){
-    guide <- ifelse(is.numeric(plt_df[[annotate]]), guide_colorbar, 
-                    guide_legend)
-    points <- list(guides(fill = guide(title = annotate, order = 1, override.aes = list(col = NA, size = 4)),
+    guide <- ifelse(is.numeric(plt_df[[annotate]]), guide_colorbar, guide_legend)
+    points <- list(guides(fill = guide(title = annotate, order = 1, override.aes = list(col = NA, size = guide.pt.size)),
                           color = "none"), 
                    geom_point(shape = 21, size = pt.size, stroke = 0, 
                               alpha = 1))

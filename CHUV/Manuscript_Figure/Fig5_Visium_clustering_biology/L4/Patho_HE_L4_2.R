@@ -62,19 +62,15 @@ p2 <- plotVisium_new(
 )
 
 # Image size and save -----------------------------------------------------
-if(sample == "B1_4"){
-  image_height <- (range(spatialCoords(sce_)[, 1])[2] - range(spatialCoords(sce_)[, 1])[1])
-  image_width <- (range(spatialCoords(sce_)[, 2])[2] - range(spatialCoords(sce_)[, 2])[1])
-}else{
-  image_height <- (range(spatialCoords(sce_)[, 2])[2] - range(spatialCoords(sce_)[, 2])[1])
-  image_width <- (range(spatialCoords(sce_)[, 1])[2] - range(spatialCoords(sce_)[, 1])[1])
-}
+image_height <- (range(spatialCoords(sce_)[, 2])[2] - range(spatialCoords(sce_)[, 2])[1])
+image_width <- (range(spatialCoords(sce_)[, 1])[2] - range(spatialCoords(sce_)[, 1])[1])
+
 
 plot_width <- 15
 plot_height <- plot_width * (image_height/image_width) - 2
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5"
-pdf(file = file.path(paste0(fig_path, "/L4_Patho_HE/"),
+pdf(file = file.path(paste0(fig_path, "/L4/"),
                      paste0(sample, "_patho_HE.pdf")),
     width = plot_width,
     height = plot_height)

@@ -1,6 +1,7 @@
 # Reading mapping results -------------------------------------------------
 mapped_all_spot <- read.csv(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Registration", "spot_mapped_cf_region.csv"))
 
+fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/SuppFig/SuppFig_regi_subspot"
 ###########################################################################
 # Spot  ----------------------------------------------
 patho_order <- c("Tumor_pure", "Most_likely_tumor", "Tumor_Stroma_mix", 
@@ -69,7 +70,6 @@ p <- SCpubr::do_ChordDiagramPlot(sample = test,
 
 p
 
-fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig3_GeoMx_Visium_Comparison"
 pdf(file = file.path(fig_path, "Regi_spot_chord_diagram.pdf"),
     width = 12.5,
     height = 12.5)

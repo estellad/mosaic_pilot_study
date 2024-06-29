@@ -1,10 +1,11 @@
+library(dplyr)
 # Reading mapping results -------------------------------------------------
 mapped_all_spot <- read.csv(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Registration", "spot_mapped_cf_region.csv"))
 mapped_all_spot$indication <- ifelse(substr(mapped_all_spot$Section_ID, 1, 1) == "B", "Breast", "Lung")
 mapped_all_subspot <- read.csv(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Registration", "subspot_mapped_cf_region.csv"))
 mapped_all_subspot$indication <- ifelse(substr(mapped_all_subspot$Section_ID, 1, 1) == "B", "Breast", "Lung")
 
-
+fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/SuppFig/SuppFig_regi_subspot"
 ###########################################################################
 # Frequency Table spot subspot by indication and CF -----------------------
 table_spot <- table(mapped_all_spot$indication, mapped_all_spot$cell_fraction)
@@ -50,7 +51,7 @@ p <- ggplot(mapping = aes(y = Count, linetype = Resolution, fill = Indication)) 
   guides(linetype = guide_legend(byrow = TRUE, override.aes = list(fill = c(NA, NA))),
          fill = guide_legend(override.aes = list(color = c(NA, NA))))
 
-fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/SuppFig_regi_subspot"
+
 pdf(file = file.path(fig_path, "regi_count_stacked_indication_side_by_side_spot_subspot.pdf"),
     width = 12.5,
     height = 7)
@@ -102,7 +103,7 @@ patho_color <- c(
   "#00e04e",
   "#4169E1",
   "#b2ff00",
-  "#00c3c3",
+  "#808000",# "#00c3c3",
   "#388E8E",
   "#ba5440",
   "#FFC1C1"
@@ -127,29 +128,13 @@ plot_each_region <- function(mapped_all_plt_subset){
     scale_fill_manual(values = patho_color) + 
     scale_linetype_manual(name = "Resolution", labels = c("Spot", "Subspot"), values = c("solid", "dashed")) +
     theme_bw() +
-    theme(axis.text.x = element_text(size = 13, angle = 90, vjust = 0.5, hjust=1),
-          legend.position =  "none",
-          panel.background = element_blank(),
-          panel.grid = element_blank(), 
-          axis.title = element_text(size = 14)) + 
-    labs(y = "Proportion") + 
-    # facet_wrap(~cell_fraction) +
-    guides(linetype = guide_legend(override.aes = list(fill = c(NA, NA))),
-           fill = guide_legend(override.aes = list(color = rep(NA, length(unique(mapped_all_plt_subset$Region))))))
-}
-
-plot_each_region <- function(mapped_all_plt_subset){
-  ggplot(data = mapped_all_plt_subset, aes(x = Region, y = prop, fill = Region, linetype = Resolution, group = Resolution)) +
-    geom_bar(stat = "identity", position = position_dodge2(width = bar_width, preserve = "single"), color = "black", width = bar_width) +
-    scale_fill_manual(values = patho_color) + 
-    scale_linetype_manual(name = "Resolution", labels = c("Spot", "Subspot"), values = c("solid", "dashed")) +
-    theme_bw() +
     theme(axis.text.x = element_blank(), # element_text(size = 13, angle = 90, vjust = 0.5, hjust=1),
           axis.ticks.x = element_blank(),
           panel.border = element_blank(), 
           legend.position =  "none",
           panel.background = element_blank(),
           panel.grid = element_blank(), 
+          plot.title = element_text(size = 18),
           axis.title = element_text(size = 14)) + 
     labs(y = "Proportion", x = "") + 
     # facet_wrap(~cell_fraction) +
@@ -158,56 +143,29 @@ plot_each_region <- function(mapped_all_plt_subset){
 }
 
 p1 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt %>% filter(cell_fraction == "Malignant")) + ggtitle("Malignant") + theme(plot.title = element_text(hjust = 0.5, size = 17))
-p2 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt %>% filter(cell_fraction == "Other")) + ggtitle("Other") + theme(plot.title = element_text(hjust = 0.5, size = 17))
-p3 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt %>% filter(cell_fraction == "T_cells")) + ggtitle("T cells") + theme(plot.title = element_text(hjust = 0.5, size = 17))
+p2 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt %>% filter(cell_fraction == "Other")) + ggtitle("Other") + theme(plot.title = element_text(hjust = 0.5, size = 17)) + ylab(" ")
+p3 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt %>% filter(cell_fraction == "T_cells")) + ggtitle("T cells") + theme(plot.title = element_text(hjust = 0.5, size = 17)) + ylab(" ")
 p4 <- plot_each_region(mapped_all_plt_subset = mapped_all_plt) + 
-  theme(legend.position = "right", 
+  theme(legend.position = "bottom", # for the complete legend
         legend.spacing.y = unit(1.0, 'cm'),
         legend.text = element_text(size = 13),
         legend.title = element_text(size = 14, face = "bold"),
-        legend.key.size = unit(2, "lines"), ) # for the complete legend
+        legend.key.size = unit(2, "lines")) + 
+  guides(colour = guide_legend(nrow = 1))
 
-fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/SuppFig_regi_subspot"
 
-# pdf(file = file.path(fig_path, "malig_spot_subspot.pdf"),
-#     width = 5,
-#     height = 7)
-# print(p1)
-# dev.off()
-# 
-# pdf(file = file.path(fig_path, "other_spot_subspot.pdf"),
-#     width = 5,
-#     height = 7)
-# print(p2)
-# dev.off()
-# 
-# pdf(file = file.path(fig_path, "tcells_spot_subspot.pdf"),
-#     width = 5,
-#     height = 7)
-# print(p3)
-# dev.off()
-
-pdf(file = file.path(fig_path, "malig_spot_subspot_minimal.pdf"),
-    width = 5,
-    height = 5.5)
-print(p1)
-dev.off()
-
-pdf(file = file.path(fig_path, "other_spot_subspot_minimal.pdf"),
-    width = 5,
-    height = 5.5)
-print(p2)
-dev.off()
-
-pdf(file = file.path(fig_path, "tcells_spot_subspot_minimal.pdf"),
-    width = 5,
-    height = 5.5)
-print(p3)
+p_combined <- p1 | p2 | p3
+pdf(file = file.path(fig_path, "AOI_spot_subspot_minimal_bar.pdf"),
+    width = 15,
+    height = 7.5)
+print(p_combined)
 dev.off()
 
 pdf(file = file.path(fig_path, "forlegend_all_spot_subspot.pdf"),
-    width = 5,
-    height = 9)
+    width = 20,
+    height = 5)
 print(p4)
 dev.off()
+
+
 

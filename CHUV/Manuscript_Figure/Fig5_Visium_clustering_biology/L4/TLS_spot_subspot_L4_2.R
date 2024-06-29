@@ -34,7 +34,10 @@ each_counts <- function(sce, feature) {
 }
 
 feature.plots <- purrr::map(markers, function(x) plot_expression(sce, x)) 
-enhanced.feature.plots <- purrr::map(markers, function(x) plot_expression(sce_enhanced, x))
+enhanced.feature.plots_no_legend <- purrr::map(markers[1:2], function(x) plot_expression(sce_enhanced, x) + theme(legend.position = "none"))
+enhanced.feature.plots_w_legend <- purrr::map(markers[3], function(x) plot_expression(sce_enhanced, x))
+# enhanced.feature.plots_w_legend <- list(plot_expression(sce_enhanced, markers[3]))
+enhanced.feature.plots <- append(enhanced.feature.plots_no_legend, enhanced.feature.plots_w_legend)
 
 spot_feature_counts <- purrr::map(markers, function(x) each_counts(sce, x))
 subspot_feature_counts <- purrr::map(markers, function(x) each_counts(sce_enhanced, x))
@@ -42,21 +45,29 @@ subspot_feature_counts <- purrr::map(markers, function(x) each_counts(sce_enhanc
 p1 <- patchwork::wrap_plots(feature.plots, ncol=3) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(spot_feature_counts)))
 
-plot_title = "Spot_TLS_logexpr.pdf"
-pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
-    width = 8,
-    height = 6)
-print(p1)
-dev.off()
+# plot_title = "Spot_TLS_logexpr.pdf"
+# pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
+#     width = 8,
+#     height = 6)
+# print(p1)
+# dev.off()
 
 p2 <- patchwork::wrap_plots(enhanced.feature.plots, ncol=3) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(subspot_feature_counts)))
 
-plot_title = "Subspot_TLS_logexpr.pdf"
-pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
-    width = 8,
+# plot_title = "Subspot_TLS_logexpr.pdf"
+# pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
+#     width = 8,
+#     height = 6)
+# print(p2)
+# dev.off()
+
+fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5"
+pdf(file = file.path(paste0(fig_path, "/L4/"),
+                     paste0(sample, "_TLS_subspot_spot.pdf")),
+    width = 10,
     height = 6)
-print(p2)
+print(p2 / p1)
 dev.off()
 
 

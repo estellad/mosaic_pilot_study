@@ -53,7 +53,7 @@ assay(spe, "scTransform", withDimnames = FALSE) <- sctransform::vst(counts(spe),
 
 ```
 
-RLE for two normalization methods. One replicate of L3 (L3_3) and L4 (L4_3) were removed by gene detection rate QC. All low signal AOIs were removed. 
+RLE for two normalization methods. 
 ```{r, fig.width=12, fig.height=4}
 plotRLExpr(spe, assay = "counts", color = slide_name) + ggtitle("Raw") + theme(legend.position = "none") |
 plotRLExpr(spe, assay = "logcounts", color = slide_name) + ggtitle("logCPM") + theme(legend.position = "none") |
@@ -90,19 +90,6 @@ plotDimRed(spe, type = "PCA", annotate = "section_id", pt.size = 1.5) +
         axis.text = element_blank(),
         axis.title = element_blank()) + 
   ggtitle("Breast")
-
-# p1 <- plotDR(spe, dimred = "PCA", col = Section_ID) + xlab("") + ylab("") + 
-#   theme(legend.position = "bottom", 
-#         legend.title=element_blank(), 
-#         axis.text.x = element_blank(),
-#         axis.text.y = element_blank(),
-#         # axis.ticks = element_blank(),
-#         panel.border = element_blank(),
-#         # plot.title = element_text(hjust = 0.5),
-#         axis.line.x = element_line(size = 0.5, linetype = "solid", colour = "black"),
-#         axis.line.y = element_line(size = 0.5, linetype = "solid", colour = "black")) + 
-#   ggtitle("Breast") 
-# p1
 ```
 
 ```{r, fig.width=12, fig.height = 4.5}
@@ -179,17 +166,6 @@ plotDimRed(spe_ruv, type = "PCA", annotate = "section_id", pt.size = 1.5) +
 ```
 
 
-After batch correction, more agreement between samples. But for manuscript, show the after norm but before batch PCA. 
-```{r, fig.width=4.5, fig.height=5, message=FALSE}
-plotDimRed(spe_ruv, type = "UMAP", annotate = "section_id", pt.size = 1.5) + 
-  theme(legend.position = "bottom",
-        legend.title=element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank()) + 
-  ggtitle("Breast - UMAP")
-```
-
-
 ```{r, message=FALSE}
 ####################################################################
 #                           Deconvolution                          #
@@ -200,10 +176,7 @@ spe_ruv <- readRDS(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_
 # NegProbe name
 negProbeName <- rownames(spe)[which(grepl("Neg", rownames(spe)))]
 
-
 # ## Normed
-assay(spe, "quantile_linear_scale") <- exp(assay(spe, "quantile")) - 1
-# spd_normed <- prepareSpatialDecon(spe, assay2use = "quantile", negProbeName = negProbeName)
 assay(spe, "quantile_linear_scale") <- exp(assay(spe, "quantile")) - 1
 spd_normed <- prepareSpatialDecon(spe, assay2use = "quantile_linear_scale", negProbeName = negProbeName) # quantile linear scale
 # spd_normed <- prepareSpatialDecon(spe, assay2use = "counts", negProbeName = negProbeName) # raw
@@ -214,42 +187,21 @@ spd_normed <- prepareSpatialDecon(spe, assay2use = "quantile_linear_scale", negP
 assay(spe_ruv, "logcounts") <- as.matrix(assay(spe_ruv, "logcounts"))
 assay(spe_ruv, "quantile_batched_linear_scale") <- as.matrix(exp(assay(spe_ruv, "logcounts")) - 1)
 spd_normed_batched <- prepareSpatialDecon(spe_ruv, assay2use = "quantile_batched_linear_scale", negProbeName = negProbeName)
-
-# names(spd_normed)
-# names(spd_normed_batched)
 ```
 
 Load signature matrix derived from most differentially expressed genes from Chromium. 
 ```{r}
-# # # Signature matrix
-# new_ref_matrix_ <- as.data.frame(read.csv(paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/Signature_matrices_CHUV_lung_breast.csv"),
-#                                      row.names = 1))
-# new_ref_matrix <- new_ref_matrix_ %>%
-#   mutate(B = B_plasma + B_cells) %>%
-#   rename(Vessel = Endothelia,
-#          Granulocyte = Mast,
-#          Fibro_muscle = Stroma,
-#          T_NK = TNK) %>%
-#   select(B, Fibro_muscle, Granulocyte, Myeloid, T_NK, Tumor, Vessel) %>%
-#   as.matrix()
-
-
 new_ref_matrix <- readRDS(paste0(absolute_path_cur, "Owkin_Pilot_Results/GeoMx/signature_matrix/level1_5/sigmat_breast_add_lung_healthy.rds"))
 
 ```
 
-
 Run deconvolution with Chromium annotated reference matrix
-
 ```{r}
 library(SpatialDecon)
 res_norm <- spatialdecon(norm = spd_normed$normCount,
                                bg = spd_normed$backGround,
                                X = new_ref_matrix,
-                               # cellmerges = safeTME.matches,
                                align_genes = TRUE)
-# samples_subset_Malig <- colnames(spe)[spe$Cell_fraction %in%  c("Malignant")]
-# subset_prop_Malig <- res_norm$prop_of_all[, samples_subset_Malig] # 18/28 cell types * 63 AOIs of Malig
 
 subset_prop <- res_norm$prop_of_all
 ```

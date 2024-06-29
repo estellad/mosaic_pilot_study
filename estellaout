@@ -1,0 +1,31 @@
+Using image at: /work/PRTNR/CHUV/DIR/rgottar1/spatial/containers/estelladong/rserver_sk_master_noglmGamPoi_mosaicpaper.sif
+1. Create an SSH tunnel between login node and computing node. In a cluster terminal, enter:
+
+    ssh -N -L 8787:localhost:56679 ydong2@dnaXXX
+
+Notes:
+    - If port 8787 is occupied, cancel the command, change port to another unused port between 1024 and 65535 and relaunch the command
+    - Do not forget to change dnaXXX to the actual compute node. Use 'Squeue' and look at 'NODELIST(REASON)' to get value of 'XXX'
+
+2. Redirect Rstudio or Jupyter Lab session to your web browser. In a local terminal (i.e not on the cluster), enter:
+
+    ssh -N -L 8787:localhost:8787 username@curnagl.dcsr.unil.ch
+
+Note: do not forget to adapt the port number to the value you chose in 1.
+
+3. Access Rstudio or Jupyter Lab session by entering 'http://localhost:8787' in your web browser.
+
+4. Log in to RStudio Server using the following credentials:
+
+    user: ydong2
+    password: OvhNyKfVor8S4warvIKr
+
+Note: for Jupyter Lab, you need to use the token in this file. Search the file for the word 'token' to find it.
+
+5. When done using RStudio Server, terminate the job by:
+
+    5.1. Exit RStudio Server session ("power" button in top right corner of RStudio Server window)
+    5.2. Enter following command on login node:
+
+    scancel -f 45186164
+

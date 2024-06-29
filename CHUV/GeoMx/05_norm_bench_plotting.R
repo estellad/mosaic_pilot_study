@@ -1,8 +1,11 @@
+disease = "lung"
+source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/mosaic_pilot_study/CHUV/GeoMx/GeoMx_init.R")
+source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/mosaic_pilot_study/CHUV/GeoMx/00_GeoMx_Paths.R")
 save_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_test_norm/")
 
 # Plotting ----------------------------------------------------------------
 norm_titles <- c("Raw", 
-                 "log(y/10^6 + 1) - logCPM", 
+                 expression(paste("log(",y,"/",10^{6}," + 1) - logCPM")), 
                  "log(y + 1) - log1p", 
                  "log(y/s + 1) - Scran size factor", 
                  "log(y/s + 1) - Mean size factor", 
