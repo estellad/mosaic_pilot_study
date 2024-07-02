@@ -1,6 +1,14 @@
+source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/mosaic_pilot_study/CHUV/GeoMx/GeoMx_init.R")
+figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig2"
+deconresultpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results_pt_specific"
+prev_deconresultpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/"
+
+deconpath = deconresultpath; plot_title = "Geo_breast_lung_decon_combined_box_outline_color_pt_specific.pdf"
+deconpath = prev_deconresultpath; plot_title = "Geo_breast_lung_decon_combined_box_outline_color.pdf"
+
 # -------------------------------------------------------------------------
-gathered_df_breast <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/breast_batched_decon_long.csv")
-gathered_df_lung <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/lung_batched_decon_long.csv")
+gathered_df_breast <- read.csv(file.path(deconpath, "breast_batched_decon_long.csv"))
+gathered_df_lung <- read.csv(file.path(deconpath, "lung_batched_decon_long.csv"))
 
 # table(c(gathered_df_breast$cell_fraction, gathered_df_breast$cell_fraction))
 
@@ -67,7 +75,7 @@ p_breast_lung
 
 
 # DLBCL -------------------------------------------------------------------
-gathered_df_dlbcl <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/dlbcl_batched_decon_long.csv")
+gathered_df_dlbcl <- read.csv(file.path(deconpath, "dlbcl_batched_decon_long.csv"))
 
 gathered_df_dlbcl <- gathered_df_dlbcl %>%
   mutate(cell_fraction = ifelse(cell_fraction == "B cells", "Malignant",
@@ -103,14 +111,12 @@ p_dlbcl <- (p5 + theme(plot.margin = unit(c(10,20,0,10), "pt"))) |
   (p8 + theme(plot.margin = unit(c(10, 10 ,0,0), "pt"))) 
 p_dlbcl
 
-p_vis_decon <- p_breast_lung / 
+p_geo_decon <- p_breast_lung / 
   p_dlbcl 
 
 
-plot_title = "Vis_breast_lung_decon_combined_outline_bnw.pdf"
-# plot_title = "Geo_breast_lung_decon_sbs_box_outline_color.pdf"
-pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2b/", plot_title),
+pdf(file = file.path(paste0(figpath, "/archive"), plot_title),
     width = 7,
     height = 4.4)
-print(p_vis_decon)
+print(p_geo_decon)
 dev.off()

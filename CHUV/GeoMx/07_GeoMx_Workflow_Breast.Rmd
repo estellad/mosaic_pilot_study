@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Load library and path
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
+absolute_path_cur <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/"
 source(paste0(absolute_path_cur, "env/ydong/Owkin_Pilot/Code/GeoMx/Manuscript/GeoMx_init.R"))
 read_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_test_norm/")
 # save_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_Final_Qcd/")
@@ -20,7 +21,7 @@ library(patchwork)
 # Read raw .dcc and LabWorksheets
 `GeomxTools::NanoStringGeoMxSet` object conversion to `SpatialExperiment`
 ```{r}
-disease = "lung"
+disease = "breast"
 spe <- readRDS(file.path(read_path, paste0(disease, ".rds")))
 # spe <- readRDS(file.path(save_path, paste0(disease, "_qcd.rds"))) 
 ```
@@ -52,7 +53,7 @@ assay(spe, "scTransform", withDimnames = FALSE) <- sctransform::vst(counts(spe),
 
 ```
 
-RLE for two normalization methods. One replicate of L3 (L3_3) and L4 (L4_3) were removed by gene detection rate QC. All low signal AOIs were removed. 
+RLE for two normalization methods. 
 ```{r, fig.width=12, fig.height=4}
 plotRLExpr(spe, assay = "counts", color = slide_name) + ggtitle("Raw") + theme(legend.position = "none") |
 plotRLExpr(spe, assay = "logcounts", color = slide_name) + ggtitle("logCPM") + theme(legend.position = "none") |
@@ -76,6 +77,9 @@ set.seed(100)
 spe <- scater::runPCA(spe, assay.type = which.assay)
 set.seed(100)
 spe <- scater::runUMAP(spe, dimred = "PCA")
+set.seed(100)
+spe <- scater::runTSNE(spe, dimred = "PCA")
+
 ```
 
 I propose to update manuscript **Figure 1c** to these three factors, slide (batch effect), segment (biology of interest), and sample (to show within patient replicates agreement after normalization). Maybe the change of slide and segment will not make it into the manuscript figure, but I keep them here for examining the effect of batch corrections. Also keep the GeoMx and Visium aesthetic in sync. 
@@ -85,20 +89,7 @@ plotDimRed(spe, type = "PCA", annotate = "section_id", pt.size = 1.5) +
         legend.title=element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank()) + 
-  ggtitle("Lung")
-
-# p1 <- plotDR(spe, dimred = "PCA", col = Section_ID) + xlab("") + ylab("") + 
-#   theme(legend.position = "bottom", 
-#         legend.title=element_blank(), 
-#         axis.text.x = element_blank(),
-#         axis.text.y = element_blank(),
-#         # axis.ticks = element_blank(),
-#         panel.border = element_blank(),
-#         # plot.title = element_text(hjust = 0.5),
-#         axis.line.x = element_line(size = 0.5, linetype = "solid", colour = "black"),
-#         axis.line.y = element_line(size = 0.5, linetype = "solid", colour = "black")) + 
-#   ggtitle("Breast") 
-# p1
+  ggtitle("Breast")
 ```
 
 ```{r, fig.width=12, fig.height = 4.5}
@@ -118,7 +109,7 @@ plotDR(spe, dimred = "UMAP", col = slide_name) | plotDR(spe, dimred = "UMAP", co
 ```
 
 # Batch correction
-For lung, RUV k = 9 is enough. 
+For breast, RUV k = 5 is enough. 
 ```{r, fig.width=7, fig.height=7}
 # Batch correction --------------------------------------------------------
 spe <- findNCGs(spe, batch_name = "slide_name", top_n = 300)
@@ -138,24 +129,26 @@ for(i in seq(9)){
 Now slides are perfectly mixed in PC1 and PC2.
 ```{r, fig.width=7, fig.height=7}
 spe_ruv <- geomxBatchCorrection(spe, factors = "cell_fraction", n_assay = assay,
-                                NCGs = metadata(spe)$NCGs, k = 9)
+                                NCGs = metadata(spe)$NCGs, k = 5)
 set.seed(100)
 spe_ruv <- scater::runPCA(spe_ruv, assay.type = "logcounts")
 
 pca_results_ruv <- reducedDim(spe_ruv, "PCA")
 
 plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
-            color = cell_fraction, title = "RUV4, k = 9", n_dimension = 4)
+            color = cell_fraction, title = "RUV4, k = 5", n_dimension = 4)
 plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
-            color = slide_name, title = "RUV4, k = 9", n_dimension = 4)
+            color = slide_name, title = "RUV4, k = 5", n_dimension = 4)
 
 ```
 
 In UMAP, biology well separated, and batch effect well mixed. 
-```{r, fig.width=11, fig.height=4.5}
+```{r, fig.width=11, fig.height=3.5}
 ## UMAP after batch correction
 set.seed(100)
 spe_ruv <- scater::runUMAP(spe_ruv, dimred = "PCA")
+set.seed(100)
+spe_ruv <- scater::runTSNE(spe_ruv, dimred = "PCA")
 
 plotDR(spe_ruv, dimred = "UMAP", col = cell_fraction) |
   plotDR(spe_ruv, dimred = "UMAP", col = slide_name)
@@ -169,134 +162,7 @@ plotDimRed(spe_ruv, type = "PCA", annotate = "section_id", pt.size = 1.5) +
         legend.title=element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank()) + 
-  ggtitle("Lung - PCA")
-```
-
-
-After batch correction, more agreement between samples. But for manuscript, show the after norm but before batch PCA. 
-```{r, fig.width=4.5, fig.height=5, message=FALSE}
-plotDimRed(spe_ruv, type = "UMAP", annotate = "section_id", pt.size = 1.5) + 
-  theme(legend.position = "bottom",
-        legend.title=element_blank(),
-        axis.text = element_blank(),
-        axis.title = element_blank()) + 
-  ggtitle("Lung - UMAP")
-```
-
-
-```{r, message=FALSE}
-####################################################################
-#                           Deconvolution                          #
-####################################################################
-# NegProbe name
-negProbeName <- rownames(spe)[which(grepl("Neg", rownames(spe)))]
-
-# ## Normed
-spd_normed <- prepareSpatialDecon(spe, assay2use = "quantile", negProbeName = negProbeName)
-
-## Normed Batched
-# force the normed, batch corrected count matrix to be not a df, but just matrix
-assay(spe_ruv, "logcounts") <- as.matrix(assay(spe_ruv, "logcounts"))
-spd_normed_batched <- prepareSpatialDecon(spe_ruv, assay2use = "logcounts", negProbeName = negProbeName)
-
-# names(spd_normed)
-# names(spd_normed_batched)
-```
-
-Load signature matrix derived from most differentially expressed genes from Chromium. 
-```{r}
-# Signature matrix
-new_ref_matrix <- as.matrix(read.csv(paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/Signature_matrices_CHUV_lung_breast.csv"), 
-                                     row.names = 1))
-```
-
-
-Run deconvolution with Chromium annotated reference matrix
-
-```{r}
-library(SpatialDecon)
-res_norm <- spatialdecon(norm = spd_normed$normCount,
-                               bg = spd_normed$backGround,
-                               X = new_ref_matrix,
-                               # cellmerges = safeTME.matches,
-                               align_genes = TRUE)
-# samples_subset_Malig <- colnames(spe)[spe$Cell_fraction %in%  c("Malignant")]
-# subset_prop_Malig <- res_norm$prop_of_all[, samples_subset_Malig] # 18/28 cell types * 63 AOIs of Malig
-
-subset_prop <- res_norm$prop_of_all
-```
-
-Make a deconvolution boxplot
-```{r, fig.width=12, fig.height=5, warning=FALSE}
-df <- data.frame(t(subset_prop))
-
-df$sample <- rownames(df)
-
-library(tidyr)
-gathered_df <- gather(df, key = "column", value = "value", -sample)
-
-CD <- as.data.frame(colData(spe)[, c("sample_id2", "section_id", "cell_fraction")])
-CD <- CD %>% rename(sample = sample_id2)
-
-library(dplyr)
-gathered_df <- gathered_df %>%
-  left_join(CD, by = "sample") %>%
-  rename(CellType = column,
-         Fraction = value)
-
-# Plot
-p <- ggplot(gathered_df, aes(x=CellType, y=Fraction)) +
-  geom_boxplot() +
-  geom_jitter(aes(color=section_id), size=1, alpha=0.9) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  facet_wrap(~cell_fraction, ncol = 5) + 
-  ggtitle("Quantile Normed Expr Decon Result")
-p
-```
-
-
-```{r}
-library(SpatialDecon)
-res_norm_batch <- spatialdecon(norm = spd_normed_batched$normCount,
-                               bg = spd_normed_batched$backGround,
-                               X = new_ref_matrix,
-                               # cellmerges = safeTME.matches,
-                               align_genes = TRUE)
-
-# samples_subset_Malig <- colnames(spe_ruv)[spe_ruv$Cell_fraction %in%  c("Malignant")]
-# subset_prop_Malig <- res_norm_batch$prop_of_all[, samples_subset_Malig] # 18/28 cell types * 63 AOIs of Malig
-
-subset_prop <- res_norm_batch$prop_of_all
-```
-
-Make deconvolution boxplot after normalization and batch correction.
-```{r, fig.width=12, fig.height=5}
-df <- data.frame(t(subset_prop))
-
-df$sample <- rownames(df)
-
-library(tidyr)
-gathered_df <- gather(df, key = "column", value = "value", -sample)
-
-CD <- as.data.frame(colData(spe)[, c("sample_id2", "section_id", "cell_fraction")])
-CD <- CD %>% rename(sample = sample_id2)
-
-library(dplyr)
-gathered_df <- gathered_df %>%
-  left_join(CD, by = "sample") %>%
-  rename(CellType = column,
-         Fraction = value)
-
-# Plot
-p <- ggplot(gathered_df, aes(x=CellType, y=Fraction)) +
-  geom_boxplot() +
-  geom_jitter(aes(color=section_id), size=1, alpha=0.9) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-  facet_wrap(~cell_fraction, ncol = 5) + 
-  ggtitle("Quantile Normed Batch Corrected Expr Decon Result")
-p
+  ggtitle("Breast - PCA")
 ```
 
 

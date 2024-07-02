@@ -8,6 +8,8 @@ library(preprocessCore)
 library(standR)
 library(patchwork)
 library(scuttle)
+library(purrr)
+library(readr)
 
 # general paths
 absolute_path_urb <- "/data/PRTNR/CHUV/DIR/rgottar1/owkin_pilot/"

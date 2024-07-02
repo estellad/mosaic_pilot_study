@@ -22,17 +22,21 @@ dev.off()
 
 
 # DLBCL post spotclean DE ----------------------------------------------------------------
-seu_de <- PrepSCTFindMarkers(seu)
+seu_de <- SCTransform(seu, verbose = FALSE, assay = "Spatial") # try re-running SCTransform
+
+# Or try DE on log counts
+
+# seu_de <- PrepSCTFindMarkers(seu)
 all.markers <- FindAllMarkers(object = seu_de, only.pos = TRUE)
 all.markers %>%
   group_by(cluster) %>%
   dplyr::filter(avg_log2FC > 1) %>%
-  slice_head(n = 20) %>%
+  slice_head(n = 40) %>%
   ungroup() -> top20
 
-p <- DoHeatmap(seu_de, features = top20$gene) + NoLegend()
+p <- DoHeatmap(seu_de, features = top20$gene, size = 15, angle = 90) + NoLegend() + theme(axis.text = element_text(size = 30))
 
-pdf(paste0(figpath, paste0("/DLBCL_Vis_DE_Heatmap.pdf")), width = 30, height = 30)
+pdf(paste0(figpath, paste0("/DLBCL_Vis_DE_Heatmap_40.pdf")), width = 40, height = 30)
 print(p)
 dev.off()
 

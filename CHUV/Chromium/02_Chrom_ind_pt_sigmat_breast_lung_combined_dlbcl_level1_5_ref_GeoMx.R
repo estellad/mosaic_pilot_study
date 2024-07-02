@@ -31,7 +31,7 @@ getSigmat <- function(chrom, pt_name = "L1"){
                                       scalingFactor = 5,                # what should all values be multiplied by for final matrix
                                       discardCellTypes = FALSE)# should cell types be filtered for types like mitotic, doublet, low quality, unknown, etc.
   
-  saveRDS(custom_mtx, file.path(sigmatpath, paste0("sigmat_lung_add_breast_healthy_", pt_name, ".rds")))
+  saveRDS(custom_mtx, file.path(sigmatpath, paste0("sigmat_", pt_name, ".rds")))
   p <- heatmap(sweep(custom_mtx, 1, apply(custom_mtx, 1, max), "/"), labRow = NA, margins = c(10, 5), cexCol = 0.7)
   print(p)
   return(custom_mtx)
@@ -89,10 +89,10 @@ sigmatD5 <- getSigmat(chrom, pt_name = "D5")
 sigmatD6 <- getSigmat(chrom, pt_name = "D6")
 
 
-# Sanity checks -----------------------------------------------------------
-list.files(sigmatpath)
-sigmat_dlbcl_combined <- readRDS(file.path(sigmatpath, "sigmat_dlbcl.rds"))
-heatmap(sweep(sigmat_dlbcl_combined, 1, apply(sigmat_dlbcl_combined, 1, max), "/"), labRow = NA, margins = c(10, 5), cexCol = 0.7) # Tumor not so clear as breast/lung, whether combine or pt-specific
+# # Sanity checks -----------------------------------------------------------
+# list.files(sigmatpath)
+# sigmat_dlbcl_combined <- readRDS(file.path(sigmatpath, "sigmat_dlbcl.rds"))
+# heatmap(sweep(sigmat_dlbcl_combined, 1, apply(sigmat_dlbcl_combined, 1, max), "/"), labRow = NA, margins = c(10, 5), cexCol = 0.7) # Tumor not so clear as breast/lung, whether combine or pt-specific
 
 
 

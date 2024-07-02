@@ -52,7 +52,7 @@ for(disease in disease_list){
 p_combined <- p_breast_4 / p_lung_4 / p_dlbcl_4
 
 figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/SuppFig/Visium_Integration_UMAP_Heatmap"
-pdf(file.path(figpath, "Visium_UMAP_Patho_Decon.pdf"), width = 26, height = 35)
+pdf(file.path(figpath, "Visium_UMAP_Patho_Decon.pdf"), width = 26, height = 40)
 print(p_combined)
 dev.off()
 

@@ -58,7 +58,7 @@ for(i in 1:nsamples){
   results = data.frame(CARD_obj@Proportion_CARD)
   write.csv(results, paste0(save_bs_path_sample, save_names[i], "_spot_level1_5_decon.csv"))
 }
-  
+
 
 
 
