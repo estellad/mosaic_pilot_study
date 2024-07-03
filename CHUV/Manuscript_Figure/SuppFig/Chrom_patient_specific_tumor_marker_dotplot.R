@@ -48,6 +48,11 @@ tu_lung <- c(
 plot_save_pt_spec_tumor_dotplot <- function(seu, genelist, 
                                             savefig_width = 3.5, savefig_height = 8, 
                                             save_title = "Breast_Chrom_DotPlot.pdf"){
+  
+  seu@assays$RNA@counts <- seu@assays$RNA@counts[rownames(seu@assays$SCT@counts), ] # DLBCL bug
+  seu@assays$RNA@data <- seu@assays$RNA@counts[rownames(seu@assays$SCT@data), ]     # DLBCL bug
+  seu@assays$RNA@meta.features <- seu@assays$RNA@meta.features[rownames(seu@assays$SCT@data), ]  # DLBCL bug
+  
   DefaultAssay(seu) <- "RNA" # SCT smooth out signal
   seu <- NormalizeData(seu, assay = "RNA", normalization.method = "LogNormalize", scale.factor = 10000) 
   # seu <- FindVariableFeatures(seu)
@@ -114,25 +119,28 @@ plot_save_pt_spec_tumor_dotplot(seu, genelist = genes_selected,
 
 
 # -------------------------------------------------------------------------
-tu_dlbcl <- c("LMO2", "RGS13", "SMIM14",  # Tu_D1
-              ,                      # Tu_D2
-              MKI67, TOP2A, CDK1, ,                               # Tu_D3
-              "THBS1", "POSTN", "COL3A1", "COL1A2", "COL1A1",                  # Tu_D4
-              TSPAN33
-              SPATC1
-              NFKB2
-              BCL2L1
-              OGI
-              CCL17
-              CD40
-              DUSP2
-              ITPKB
-              CCL22,    # Tu_D5
-              "ACKR1", "MEOX2", "CCL14", "TSPAN7", "PLA1A", "VWF", "GIMAP4"    # Tu_D6
+tu_dlbcl <- c("NME2", "FCRL1", "LMO2", "IGKC", "MT-CO3", "TMSB4X", "GRHPR",
+              "MPEG1", "CD1C", "CD52", "LTB", "SMIM14", "TNFRSF13C", "CD79A",
+              "CD22", "FCRL2", "FCRL5",                                    # D1 clus 2, 5, 13, 19:
+              "MT-CYB", "NIBAN3", "SPIB", "MT-ATP6", "HIST1H1C", "IGHM",
+              "MT-ND4", "TCL1A", "MT-ND4L", "HIST1H1R",                    # D2 clus 0:
+              "CD83", "SWAP70", "SEL1L3", "FCRL3", "ACTB", "IL4I1", "FAM3C",
+              "ACTG2", "CD74", "MS4A1", "MT-CYB", "CNN2", "LRMP", "LCP1",  # D3 clus 1, 6, 26:
+              "GGA2", "HELLS", "RASGRP2", "NKX6-3", "DTX1", "BCL7A", "MAT2A",
+              "ARGLU1", "ALOX5", "AKNA", "ARHGEF1", "PNN", "TMC8",         # D4 clus 9&22:
+              "TSPAN33", "SPATC1", "NFKB2", "BCL2L1", "OGI", "CCL17",
+              "CD40", "DUSP2", "ITPKB", "CCL22",                           # D5 clus 17:
+              "POU2F2", "CCDC88A", "LENG8", "KLHL6", "TNFRSF13B", "BCL2",
+              "NFATC1", "MT-ND6", "NIBAN3", "FCRL2"                        # D6 clus 12:
 )
 
+seu <- readRDS(file.path(chrompath, "chrom_dlbcl.rds"))
+seu$patient <- paste0(substr(seu$sample_id, 1, 1), substr(seu$sample_id, 7, 7))
+Idents(seu) <- factor(seu$patient, levels = paste0("D", 1:6))
 
-
+plot_save_pt_spec_tumor_dotplot(seu, genelist = tu_dlbcl,
+                                savefig_width = 5, savefig_height = 17,
+                                save_title = "dlbcl_Chrom_DotPlot_RNA_lognorm_full.pdf")
 
 
 

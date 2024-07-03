@@ -23,10 +23,14 @@ dev.off()
 
 # DLBCL post spotclean DE ----------------------------------------------------------------
 seu_de <- SCTransform(seu, verbose = FALSE, assay = "Spatial") # try re-running SCTransform
+# # Or try DE on log counts
+# test <- VariableFeatures(seu)
+# seu <- NormalizeData(seu, normalization.method = "LogNormalize", scale.factor = 10000)  
+# VariableFeatures(seu) <- test
+# seu <- ScaleData(seu)
 
-# Or try DE on log counts
 
-# seu_de <- PrepSCTFindMarkers(seu)
+seu_de <- PrepSCTFindMarkers(seu)
 all.markers <- FindAllMarkers(object = seu_de, only.pos = TRUE)
 all.markers %>%
   group_by(cluster) %>%
@@ -34,7 +38,14 @@ all.markers %>%
   slice_head(n = 40) %>%
   ungroup() -> top20
 
-p <- DoHeatmap(seu_de, features = top20$gene, size = 15, angle = 90) + NoLegend() + theme(axis.text = element_text(size = 30))
+p <- DoHeatmap(seu_de, features = top20$gene, size = 15, angle = 90) + 
+  NoLegend() + 
+  theme(axis.text = element_text(size = 30)) 
+p
+# +
+#   scale_fill_gradientn(colors = c("blue", "white", "red"))
+#   
+  
 
 pdf(paste0(figpath, paste0("/DLBCL_Vis_DE_Heatmap_40.pdf")), width = 40, height = 30)
 print(p)
