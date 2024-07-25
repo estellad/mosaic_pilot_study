@@ -1,7 +1,7 @@
 Using image at: /work/PRTNR/CHUV/DIR/rgottar1/spatial/containers/estelladong/rserver_sk_master_noglmGamPoi_mosaicpaper.sif
 1. Create an SSH tunnel between login node and computing node. In a cluster terminal, enter:
 
-    ssh -N -L 8787:localhost:44561 ydong2@dnaXXX
+    ssh -N -L 8787:localhost:55709 ydong2@dnaXXX
 
 Notes:
     - If port 8787 is occupied, cancel the command, change port to another unused port between 1024 and 65535 and relaunch the command
@@ -18,7 +18,7 @@ Note: do not forget to adapt the port number to the value you chose in 1.
 4. Log in to RStudio Server using the following credentials:
 
     user: ydong2
-    password: wKApEBePW/19CXJLbUT2
+    password: jh97K32x8YJKM0pZeGXP
 
 Note: for Jupyter Lab, you need to use the token in this file. Search the file for the word 'token' to find it.
 
@@ -27,5 +27,5 @@ Note: for Jupyter Lab, you need to use the token in this file. Search the file f
     5.1. Exit RStudio Server session ("power" button in top right corner of RStudio Server window)
     5.2. Enter following command on login node:
 
-    scancel -f 45212337
+    scancel -f 45483777
 

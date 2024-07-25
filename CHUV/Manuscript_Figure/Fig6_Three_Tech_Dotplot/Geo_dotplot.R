@@ -4,10 +4,49 @@ library(dplyr)
 library(tidyr)
 library(tidyverse)
 library(ggridges)
-# Dot plot ----------------------------------------------------------------
-geo <- readRDS("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/GeoMx/GeoMx_Normed_Batched/dlbcl_seu_ruv.rds")
 
-geo_decon_result <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/dlbcl_batched_decon_long.csv")
+figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig6/"
+figpath_ridge <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/SuppFig/Fig6_Ridge"
+
+# Dot plot ----------------------------------------------------------------
+datapath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/GeoMx/GeoMx_Normed_Batched"
+geo_spe <- readRDS(file.path(datapath, "dlbcl_spe_ruv.rds"))
+geo <- as.Seurat(geo_spe)
+
+geo <- readRDS("dlbcl_seu_ruv.rds")
+# head(Idents(geo)) # Levels: T cells Macrophage Other Tu_D1 Tu_D2 Tu_D3 Tu_D4 Tu_D5 Tu_D6
+
+geo <- geo[rownames(geo) %in% DLBCLnChromium_Marker_Gene_List, ]
+
+DLBCLnChromium_Marker_Gene_List <- c(
+  "MS4A1", "TNFRSF13C", "CD79B", "CD37", "PSMB8", "CD19", "TYMS",
+  "TUBB", "TOP2A", "POLD4", "CD47", "CD52", "BLK", "CD38", "MAP2K1",
+  "CD40", "BCL2L1", "TNFRSF8", "SMO", "RARA", "TYK2", "TNFRSF10B"
+)
+
+p <- DotPlot(
+  geo,
+  features = rev(DLBCLnChromium_Marker_Gene_List)) + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 90, size = 8, hjust = 1, vjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.y = element_blank(),
+        legend.position = "none")
+
+plot_title = "Geo_DLBLCnChromium_dotplot_by_AOI.pdf"
+pdf(file = file.path(figpath, plot_title),
+    width = 2,
+    height = 4)
+print(p)
+dev.off()
+
+##########################################################################
+# Introducing GeoMx
+##########################################################################
+geo_decon_result <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results/dlbcl_batched_decon_long.csv") # not patient specific
+# geo_decon_result <- read.csv("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results_pt_specific/dlbcl_batched_decon_long.csv") # patient specific
 
 
 geo_decon_result_ <- geo_decon_result %>%
@@ -95,6 +134,10 @@ geo_decon_result_1 <- geo_decon_result_ %>%
          decon_max_val_names_threshold_pt = ifelse(decon_max_val_names_threshold == "Tumor", paste0(substr(decon_max_val_names_threshold, 1, 2), "_", patient), decon_max_val_names_threshold)
          )
 
+palette_ridge <- c("#388E8E", "#9A32CD", "#4169E1", "#FF8C00", "#EEEE00", "#FFD700", "#A2CD5A", "#00EE76", "#ADFF2F")
+ridge_order <- c("Other", "Macrophage", "T cells", "Tu_D1", "Tu_D2", "Tu_D3", "Tu_D4", "Tu_D5", "Tu_D6")
+names(palette_ridge) <- ridge_order
+
 # Color by AOI -------------------------------------------------------------
 test_ <- geo_decon_result_1 %>%  # Keep expected decon proportion in each consensus region only
   filter((cell_fraction_pt == "Tu_D1" & CellType == "Tumor") |
@@ -109,9 +152,10 @@ test_ <- geo_decon_result_1 %>%  # Keep expected decon proportion in each consen
 
 table(test_$cell_fraction_pt)
 # Macrophage      Other    T cells      Tu_D1      Tu_D2      Tu_D3      Tu_D4      Tu_D5      Tu_D6 
-# 19          9         52          8         12          8          7         13          8 
+#         19          9         52          8         12          8          7         13          8 
 
 # # GeoMx by AOI ------------------------------------------------------
+test_$cell_fraction_pt <- factor(test_$cell_fraction_pt, levels = rev(ridge_order))
 p <- ggplot(test_, aes(x = Fraction, y = cell_fraction_pt, fill = cell_fraction_pt)) +
   geom_density_ridges(scale = 4, # stat = "binline", binwidth=0.01, draw_baseline = F
                       alpha = 0.5) +
@@ -120,17 +164,26 @@ p <- ggplot(test_, aes(x = Fraction, y = cell_fraction_pt, fill = cell_fraction_
   coord_cartesian(clip = "off") + # to avoid clipping of the very top of the top ridgeline
   theme_ridges() +
   theme(legend.position = "none") + 
-  xlim(c(0, 1))
+  xlim(c(0, 1)) + 
+  scale_fill_manual(values = palette_ridge) + 
+  ylab("AOI label")
 
 sample_size_df <- data.frame(table(test_$cell_fraction_pt)) %>%
-  rename(n = Freq,
+  dplyr::rename(n = Freq,
          ylabel = Var1) %>%
   mutate(n = paste0("n = ", n))
 
-p + geom_text(data=sample_size_df,
+p <- p + geom_text(data=sample_size_df,
               aes(label = n, x= 1, y=ylabel, vjust = -2, hjust=-0.1),
               position = position_stack(),
               inherit.aes = FALSE)
+
+plot_title = "Geo_ridge_AOI.pdf"
+pdf(file = file.path(figpath_ridge, plot_title),
+    width = 9,
+    height = 6)
+print(p)
+dev.off()
 
 ############################################################################
 # Color by consensus (to improve purity) -----------------------------------
@@ -150,6 +203,7 @@ table(test$decon_max_val_names_consensus_pt)
 # 16          9         30          8          9          4          4          9          8 
 
 # GeoMx by consensus ------------------------------------------------------
+test$decon_max_val_names_consensus_pt <- factor(test$decon_max_val_names_consensus_pt, levels = rev(ridge_order))
 p <- ggplot(test, aes(x = Fraction, y = decon_max_val_names_consensus_pt, fill = decon_max_val_names_consensus_pt)) +
   geom_density_ridges(scale = 4, # , stat = "binline", binwidth=0.01, draw_baseline = F
                       alpha=0.5) + 
@@ -158,19 +212,30 @@ p <- ggplot(test, aes(x = Fraction, y = decon_max_val_names_consensus_pt, fill =
   coord_cartesian(clip = "off") + # to avoid clipping of the very top of the top ridgeline
   theme_ridges() +
   theme(legend.position = "none") + 
-  xlim(c(0, 1))
+  xlim(c(0, 1)) + 
+  scale_fill_manual(values = palette_ridge) + 
+  ylab("Consensus label by AOI & Deconvolution majority vote")
 
 sample_size_df <- data.frame(table(test$decon_max_val_names_consensus_pt)) %>%
-  rename(n = Freq,
+  dplyr::rename(n = Freq,
          ylabel = Var1) %>%
   mutate(n = paste0("n = ", n))
 
-p + geom_text(data=sample_size_df,
+p <- p + geom_text(data=sample_size_df,
               aes(label = n, x= 1, y=ylabel, vjust = -2, hjust=-0.1),
               position = position_stack(),
               inherit.aes = FALSE)
 
+plot_title = "Geo_ridge_consensus.pdf"
+pdf(file = file.path(figpath_ridge, plot_title),
+           width = 9,
+           height = 6)
+print(p)
+dev.off()
 
+
+geo$consensus <- geo$sample_id2 %in% test$sample
+saveRDS(geo, "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/GeoMx/GeoMx_Normed_Batched/dlbcl_seu_ruv.rds")
 
 #################################################################
 DLBCLnChromium_Marker_Gene_List <- c(
@@ -180,8 +245,6 @@ DLBCLnChromium_Marker_Gene_List <- c(
 )
 
 geo <- geo[rownames(geo) %in% DLBCLnChromium_Marker_Gene_List, ]
-
-geo_small <- geo
 
 geo_small <- geo[, geo$sample_id2 %in% test$sample]
 

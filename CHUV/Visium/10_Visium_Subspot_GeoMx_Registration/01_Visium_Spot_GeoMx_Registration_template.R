@@ -84,7 +84,7 @@ final_spot <- final_spot %>%
 disease = "lung"
 source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/Owkin_Pilot/Code/Visium/Manuscript/01_params.R")
 samples_for_registration <- c("L1_2", "L2_2", "L3_2", "L4_2") # Visium
-geo_reg_names <- c("L1_1", "L2_1", "L3_1", "L4_1")
+geo_reg_names <- c("L1_1", "L2_1", "L3_3", "L4_1")
 
 foldername <- ifelse(disease == "dlbcl", "DLBCL", str_to_title(disease))
 
@@ -94,15 +94,15 @@ for(i in 1:length(samples_for_registration)){
   # Expr -----------------------------------------------------------
   # save_bs_path <- paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/Visium_BayesSpace/", foldername, "/", samples_for_registration[i], "/")
   # sce <- readRDS(file.path(save_bs_path, paste0(samples_for_registration[i], "_baye_clustered.rds"))) # spot
-  save_bs_path <- paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/Visium_BayesSpace_joint_decont/", foldername, "/", samples_for_registration[i], "/")
+  save_bs_path <- paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/Visium_BayesSpace_raw/", foldername, "/", samples_for_registration[i], "/")
   sce <- readRDS(file.path(save_bs_path, paste0(samples_for_registration[i], "_baye_clustered.rds"))) # spot
   assays(sce)
   
   spotmatch_small_subset <- final_spot %>%
     filter(Section_ID_Vis == samples_for_registration[i]) %>%
-    rename(barcode = Spot.barcode,
-           sample = Section_ID_Vis) %>%
-    mutate(barcode = paste0(sample, "_", barcode))
+    dplyr::rename(barcode = Spot.barcode,
+           sample = Section_ID_Vis) #%>%
+    # mutate(barcode = paste0(sample, "_", barcode))
   
   # # A tibble: 6 × 15
   # Section_ID_Vis ROI.ID roi       Spot.array.location Spot.barcode segment Total.intersection.a…¹ Spot.area..px. Section_ID overlap_pct Sample_ID Cell_fraction
