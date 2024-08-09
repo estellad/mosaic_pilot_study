@@ -34,15 +34,29 @@ markers <- list()
 #                           # "CD169"
 #                           )
 
-# B-cell
-markers[["B-cell"]] <- c("CXCL13", "MS4A1")
-# Follicular Dendritic Cell (FDC)
-markers[["FDC"]] <- c("FDCSP")
-# T follicular helper cells (TFH)
-markers[["TFH"]] <- c("PDCD1", "CD4", "CXCR5") # "CD3", 
+# # B-cell
+# markers[["B-cell"]] <- c("CXCL13", "MS4A1")
+# # Follicular Dendritic Cell (FDC)
+# markers[["FDC"]] <- c("FDCSP")
+# # T follicular helper cells (TFH)
+# markers[["TFH"]] <- c("PDCD1", "CD4", "CXCR5") # "CD3", 
+# markers <- unlist(markers)
+
+# c("CD19", "CD8", "CXCL9", "CXCL10", "CXCL11", 
+#   "LAMP2", "CD209", "ITGAX", "CD74", "HHLA3", "HHLA2",
+#   "CD40L", "IL21", "IL6",
+#   "CCL19",
+#   "PECAM1", "SELL", "CHST4",
+#   "MKI67")[c("CD19", "CD8", "CXCL9", "CXCL10", "CXCL11", 
+# "LAMP2", "CD209", "ITGAX", "CD74", "HHLA3", "HHLA2",
+# "CD40L", "IL21", "IL6",
+# "CCL19",
+# "PECAM1", "SELL", "CHST4",
+# "MKI67") %in% rownames(sce)]
+
+markers <- c("CXCL9", "CXCL10", "CXCL11", "LAMP2", "CD209", "ITGAX", "CD74", "HHLA3", "HHLA2", "IL6", "CCL19", "PECAM1", "SELL", "CHST4", "MKI67")
 
 
-markers <- unlist(markers)
 
 plot_expression <- function(sce_obj = sce, marker = "CD4"){
   featurePlot(sce_obj, marker, assay.type = "log1p", color=NA) +
@@ -56,18 +70,18 @@ each_counts <- function(sce, feature) {
   assay(sce, "log1p")[feature, ]
 }
 
-feature.plots <- purrr::map(markers, function(x) plot_expression(sce, x)) 
+feature.plots <- purrr::map(markers[8:15], function(x) plot_expression(sce, x)) 
 # enhanced.feature.plots_no_legend <- purrr::map(markers[1:4], function(x) plot_expression(sce_enhanced, x) + theme(legend.position = "none"))
-enhanced.feature.plots_w_legend <- purrr::map(markers, function(x) plot_expression(sce_enhanced, x))
+enhanced.feature.plots_w_legend <- purrr::map(markers[8:15], function(x) plot_expression(sce_enhanced, x))
 enhanced.feature.plots <- enhanced.feature.plots_w_legend # append(enhanced.feature.plots_no_legend, enhanced.feature.plots_w_legend)
 
 spot_feature_counts <- purrr::map(markers, function(x) each_counts(sce, x))
 subspot_feature_counts <- purrr::map(markers, function(x) each_counts(sce_enhanced, x))
 # -------------------------------------------------------------------------
-p1 <- patchwork::wrap_plots(feature.plots, ncol = 6) + plot_layout(guides = "collect") & 
+p1 <- patchwork::wrap_plots(feature.plots, ncol = 8) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(spot_feature_counts)))
 
-p2 <- patchwork::wrap_plots(enhanced.feature.plots, ncol = 6) + plot_layout(guides = "collect") & 
+p2 <- patchwork::wrap_plots(enhanced.feature.plots, ncol = 8) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(subspot_feature_counts)))
 
 
