@@ -201,10 +201,12 @@ p_decon_ind_Bcells <- p0 + xlim(c(480, 606)) + ylim(c(458, 626)) +
         axis.ticks = element_blank(),
         axis.text = element_blank(),
         legend.position = "right",
-        legend.title=element_text(size = 16,face = "bold"),
-        legend.text=element_text(size = 15)) +
+        legend.title=element_text(size = 10,face = "bold"),
+        legend.text=element_text(size = 8)) +
   viridis::scale_fill_viridis(option="inferno") + 
-  viridis::scale_color_viridis(option="inferno")
+  viridis::scale_color_viridis(option="inferno") +
+  guides(fill = guide_colorbar(title.position = "left", title.hjust = 0.5, direction = "horizontal",
+                               barwidth = unit(2.5, "cm"), barheight = unit(0.3, "cm")))
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig4/B1_cropped"
 pdf(file = file.path(fig_path, paste0(sample, "_decon_ind_HE_Bcell.pdf")),
@@ -233,10 +235,12 @@ p_decon_ind_Tcells <- p0 + xlim(c(755, 920)) + ylim(c(100, 263)) +
         axis.ticks = element_blank(),
         axis.text = element_blank(),
         legend.position = "right",
-        legend.title=element_text(size = 16,face = "bold"),
-        legend.text=element_text(size = 15)) +
+        legend.title=element_text(size = 10,face = "bold"),
+        legend.text=element_text(size = 8)) +
   viridis::scale_fill_viridis(option="inferno") + 
-  viridis::scale_color_viridis(option="inferno")
+  viridis::scale_color_viridis(option="inferno") +
+  guides(fill = guide_colorbar(title.position = "left", title.hjust = 0.5, direction = "horizontal",
+                               barwidth = unit(2.5, "cm"), barheight = unit(0.3, "cm")))
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig4/B1_cropped"
 pdf(file = file.path(fig_path, paste0(sample, "_decon_ind_HE_Tcell.pdf")),

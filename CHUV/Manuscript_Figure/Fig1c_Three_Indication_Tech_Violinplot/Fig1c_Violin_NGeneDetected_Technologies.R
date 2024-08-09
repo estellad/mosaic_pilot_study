@@ -1,3 +1,6 @@
+library(stringr)
+library(patchwork)
+
 scaleFUN <- function(x) sprintf("%.0f", x) # have no decimal on x-axis
 
 ## GeoMx
@@ -9,7 +12,8 @@ plt_df_per_indication <- function(disease){
   if(disease == "dlbcl"){spe$section_id <- spe$patient}
   plt_df <- data.frame(section = spe$section_id, 
                        # loglibsize = spe$log_lib_size,
-                       ngenedetected = spe$gene_detection_rate,
+                       # ngenedetected = spe$gene_detection_rate,
+                       ngenedetected = spe$genes_detected, 
                        indication = ifelse(disease == "dlbcl", "DLBCL", str_to_title(disease)),
                        cell_fraction = spe$cell_fraction)
   return(plt_df)
@@ -79,7 +83,7 @@ geo_plot <-
                                  legen.title.size = 5.5,
                                  legen.key.size = 0.5, 
                                  strip_color = "#00c78cff",
-                                 strip_fill = "#00c78c2e") + ylim(0, 1)) /
+                                 strip_fill = "#00c78c2e")) / # + ylim(0, 1))
   plot_spacer() /
   (plot_violin_per_indication_geo(plt_df = plt_df_geo_lung, 
                                  section_order = c("L1_1", "L2_1", "L3_1", "L3_3", "L4_3"), 
@@ -92,7 +96,7 @@ geo_plot <-
                                  legen.title.size = 5.5,
                                  legen.key.size = 0.5, 
                                  strip_color = "#ffa54fff",
-                                 strip_fill = "#ffa54f31") + ylim(0, 1)) /
+                                 strip_fill = "#ffa54f31")) / #  + ylim(0, 1))
   plot_spacer() /
   (plot_violin_per_indication_geo(plt_df = plt_df_geo_dlbcl, 
                                  section_order = c("D1", "D2", "D3", "D4", "D5", "D6"), 
@@ -105,11 +109,11 @@ geo_plot <-
                                  legen.title.size = 5.5, # 3.5,
                                  legen.key.size = 0.4, 
                                  strip_color = "#ffd700ff",
-                                 strip_fill = "#ffd70033") + ylim(0, 1) + theme(legend.margin = margin(0, 0, 0, 0))) + 
+                                 strip_fill = "#ffd70033") + theme(legend.margin = margin(0, 0, 0, 0))) + # + ylim(0, 1)
   plot_layout(heights = c(4, -0.95, 4, -0.95, 4))
 geo_plot
 
-pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig1/Fig1c/geo_ngenedetected_violin_bold_colorfacet.pdf",
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig1/Fig1c/geo_ngenedetected_violin_bold_colorfacet_notGDR.pdf",
       # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/geo_ngenedetected_violin_bold.pdf",
       # "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1c/geo_ngenedetected_violin.pdf",
     width = 3.3,

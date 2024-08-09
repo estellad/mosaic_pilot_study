@@ -2,7 +2,7 @@ source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/mosaic_pilot_study/CHUV/
 figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig2"
 deconresultpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/For_level1_5_immune_decon_results"
 
-deconpath = deconresultpath; plot_title = "Geo_breast_lung_decon_sbs_box_outline_color_immune.pdf"
+deconpath = deconresultpath; plot_title = "Geo_breast_lung_decon_sbs_box_outline_color_immune_ylim01.pdf"
 
 # -------------------------------------------------------------------------
 CT_order <- c("Epithelia", "Stroma", "Tumor", "Macrophage", "T cells", "B cells", "NK", "Myeloid else") # Fig 2, 3 
@@ -40,7 +40,7 @@ plot_each_patho_facet <- function(plt_df, facet_name_i = "Tumor_related"){
   p <- ggplot(plt_df, aes(x=CellType, y=Fraction, color=Indication)) +
     geom_boxplot(outlier.size = 1, outlier.alpha = 0.9) +
     theme_classic() +
-    # ylim(c(0, 1)) + 
+    ylim(c(0, 1)) + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
           strip.background = element_blank(),
           strip.text = element_blank(),
@@ -61,15 +61,15 @@ p1 <- plot_each_patho_facet(plt_df = gathered_df_breast_lung, facet_name_i = fac
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 p2 <- plot_each_patho_facet(plt_df = gathered_df_breast_lung, facet_name_i = facet_name[2]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(), 
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(), 
         axis.text.x = element_blank())
 p3 <- plot_each_patho_facet(plt_df = gathered_df_breast_lung, facet_name_i = facet_name[3]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(),
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(),
         axis.text.x = element_blank())
 p4 <- plot_each_patho_facet(plt_df = gathered_df_breast_lung, facet_name_i = facet_name[4]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(),
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(),
         axis.text.x = element_blank())
 
 p_breast_lung <- (p1 + theme(plot.margin = unit(c(0,20,0,10), "pt"))) | 
@@ -94,14 +94,14 @@ palette = "black"
 p5 <- plot_each_patho_facet(plt_df = gathered_df_dlbcl, facet_name_i = facet_name[1]) + 
   scale_color_manual(values = palette)
 p6 <- plot_each_patho_facet(plt_df = gathered_df_dlbcl, facet_name_i = facet_name[2]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p7 <- plot_each_patho_facet(plt_df = gathered_df_dlbcl, facet_name_i = facet_name[3]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p8 <- plot_each_patho_facet(plt_df = gathered_df_dlbcl, facet_name_i = facet_name[4]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
 p_dlbcl <- (p5 + theme(plot.margin = unit(c(10,20,0,10), "pt"))) | 
   (p6 + theme(plot.margin = unit(c(10,20,0,0), "pt"))) | 

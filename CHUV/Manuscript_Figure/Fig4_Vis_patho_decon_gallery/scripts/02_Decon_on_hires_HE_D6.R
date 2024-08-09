@@ -198,10 +198,12 @@ p_decon_ind_Tu_D6_BCL2 <- p0 + xlim(c(940, 1420)) + ylim(c(1140, 1600)) +
         axis.ticks = element_blank(),
         axis.text = element_blank(),
         legend.position = "right",
-        legend.title=element_text(size = 16,face = "bold"),
-        legend.text=element_text(size = 15)) +
+        legend.title=element_text(size = 10,face = "bold"),
+        legend.text=element_text(size = 8)) +
   viridis::scale_fill_viridis(option="inferno") + 
-  viridis::scale_color_viridis(option="inferno")
+  viridis::scale_color_viridis(option="inferno") +
+  guides(fill = guide_colorbar(title.position = "left", title.hjust = 0.5, direction = "horizontal",
+                               barwidth = unit(2.5, "cm"), barheight = unit(0.3, "cm")))
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig4/D6_cropped"
 pdf(file = file.path(fig_path, paste0(sample, "_decon_ind_HE_Tu_D6_BCL2.pdf")),
@@ -229,10 +231,12 @@ p_decon_ind_Epi_mucous <- p0 + xlim(c(940, 1420)) + ylim(c(1140, 1600)) +
         axis.ticks = element_blank(),
         axis.text = element_blank(),
         legend.position = "right",
-        legend.title=element_text(size = 16,face = "bold"),
-        legend.text=element_text(size = 15)) +
+        legend.title=element_text(size = 10,face = "bold"),
+        legend.text=element_text(size = 8)) +
   viridis::scale_fill_viridis(option="inferno") + 
-  viridis::scale_color_viridis(option="inferno")
+  viridis::scale_color_viridis(option="inferno") +
+  guides(fill = guide_colorbar(title.position = "left", title.hjust = 0.5, direction = "horizontal",
+                               barwidth = unit(2.5, "cm"), barheight = unit(0.3, "cm")))
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig4/D6_cropped"
 pdf(file = file.path(fig_path, paste0(sample, "_decon_ind_HE_Epi_mucous.pdf")),
@@ -260,10 +264,12 @@ p_decon_ind_Epi_Mucous_surface_gastric <- p0 + xlim(c(940, 1420)) + ylim(c(1140,
         axis.ticks = element_blank(),
         axis.text = element_blank(),
         legend.position = "right",
-        legend.title=element_text(size = 16,face = "bold"),
-        legend.text=element_text(size = 15)) +
+        legend.title=element_text(size = 10,face = "bold"),
+        legend.text=element_text(size = 8)) +
   viridis::scale_fill_viridis(option="inferno") + 
-  viridis::scale_color_viridis(option="inferno")
+  viridis::scale_color_viridis(option="inferno") +
+  guides(fill = guide_colorbar(title.position = "left", title.hjust = 0.5, direction = "horizontal",
+                               barwidth = unit(2.5, "cm"), barheight = unit(0.3, "cm")))
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig4/D6_cropped"
 pdf(file = file.path(fig_path, paste0(sample, "_decon_ind_HE_Epi_Mucous_surface_gastric.pdf")),

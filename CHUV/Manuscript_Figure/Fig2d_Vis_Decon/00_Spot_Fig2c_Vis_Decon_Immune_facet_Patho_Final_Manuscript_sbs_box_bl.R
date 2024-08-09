@@ -6,7 +6,8 @@ library(patchwork)
 CT_order <- c("Epithelia", "Stroma", "Tumor", "Macrophage", "T cells", "B cells", "NK", "Myeloid else") # Fig 2, 3 
 
 # -------------------------------------------------------------------------
-vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/Fig2_final_immune"
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/Fig2_final_immune" # CARD
+vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/cell2location_vis_long" # C2L
 decon_patho_gather_breast <- read.csv(file.path(vis_decon_path, "vis_breast_decon_immune_long.csv"))
 decon_patho_gather_lung <- read.csv(file.path(vis_decon_path, "vis_lung_decon_immune_long.csv"))
 
@@ -69,7 +70,7 @@ plot_each_patho_facet <- function(plt_df, facet_name_i = "Tumor_related"){
   p <- ggplot(plt_df, aes(x=CellType, y=Fraction, color=Indication)) +
     geom_boxplot(outlier.size = 0.05, outlier.alpha = 0.1) +
     theme_classic() +
-    # ylim(c(0, 1)) + 
+    ylim(c(0, 1)) + 
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
           strip.background = element_blank(),
           strip.text = element_blank(),
@@ -90,15 +91,15 @@ p1 <- plot_each_patho_facet(plt_df = decon_patho_gather_breast_lung_subset, face
   theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
 p2 <- plot_each_patho_facet(plt_df = decon_patho_gather_breast_lung_subset, facet_name_i = facet_name[2]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(), 
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(), 
         axis.text.x = element_blank())
 p3 <- plot_each_patho_facet(plt_df = decon_patho_gather_breast_lung_subset, facet_name_i = facet_name[3]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(),
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(),
         axis.text.x = element_blank())
 p4 <- plot_each_patho_facet(plt_df = decon_patho_gather_breast_lung_subset, facet_name_i = facet_name[4]) + 
   scale_color_manual(values = palette) + 
-  theme(#axis.text.y = element_blank(), axis.ticks = element_blank(),
+  theme(axis.text.y = element_blank(), axis.ticks = element_blank(),
         axis.text.x = element_blank())
 
 p_breast_lung <- (p1 + theme(plot.margin = unit(c(0,20,0,10), "pt"))) | 
@@ -146,14 +147,14 @@ palette = "black"
 p5 <- plot_each_patho_facet(plt_df = decon_patho_gather_dlbcl_subset, facet_name_i = facet_name[1]) + 
   scale_color_manual(values = palette)
 p6 <- plot_each_patho_facet(plt_df = decon_patho_gather_dlbcl_subset, facet_name_i = facet_name[2]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p7 <- plot_each_patho_facet(plt_df = decon_patho_gather_dlbcl_subset, facet_name_i = facet_name[3]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) 
 p8 <- plot_each_patho_facet(plt_df = decon_patho_gather_dlbcl_subset, facet_name_i = facet_name[4]) + 
-  scale_color_manual(values = palette) #+ 
-  #theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+  scale_color_manual(values = palette) + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 
 p_dlbcl <- (p5 + theme(plot.margin = unit(c(10,20,0,10), "pt"))) | 
   (p6 + theme(plot.margin = unit(c(10,20,0,0), "pt"))) | 
@@ -165,7 +166,8 @@ p_vis_decon <- p_breast_lung /
   p_dlbcl 
 
 
-plot_title = "Vis_breast_lung_decon_sbs_box_outline_color_immune.pdf"
+# plot_title = "Vis_breast_lung_decon_sbs_box_outline_color_immune.pdf"
+plot_title = "Vis_breast_lung_decon_sbs_box_outline_color_immune_c2l.pdf"
 pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig2/", plot_title),
     width = 7,
     height = 4.4)

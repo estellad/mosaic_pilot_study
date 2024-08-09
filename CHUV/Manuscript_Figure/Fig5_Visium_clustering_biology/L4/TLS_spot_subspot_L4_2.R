@@ -1,5 +1,10 @@
+library(BayesSpace)
+library(patchwork)
+library(ggplot2)
+
 disease = "Lung"
 sample = "L4_2"
+sample = "L1_4"
 # resolution = "spots"
 # resolution = "subspots"
 read_path = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/Visium_BayesSpace_raw/", disease, "/", sample)
@@ -14,10 +19,28 @@ sce_enhanced <- readRDS(file.path(read_path, paste0(sample, "_baye_clustered_all
 # raw_assay_name = "decont_subspot"
 # }
 
+dim(rowData(sce_enhanced))
+
 # -------------------------------------------------------------------------
 markers <- list()
+# markers[["B-cell"]] <- c("CXCL13", "MS4A1")#, "CD23")
+# markers[["T-cell"]] <- c("CD4", "PDCD1", "CD3E", "CD3D", "CD3G")
+# markers[["Myeloid"]] <- c(# "CD11B", 
+#                           "CD14", # "CD15", 
+#                           "CD33", # "CD64",
+#                           "CD68", # "CD117", 
+#                           # "CD123", 
+#                           "CD163" #, 
+#                           # "CD169"
+#                           )
+
+# B-cell
 markers[["B-cell"]] <- c("CXCL13", "MS4A1")
-markers[["T-cell"]] <- c("CD4")
+# Follicular Dendritic Cell (FDC)
+markers[["FDC"]] <- c("FDCSP")
+# T follicular helper cells (TFH)
+markers[["TFH"]] <- c("PDCD1", "CD4", "CXCR5") # "CD3", 
+
 
 markers <- unlist(markers)
 
@@ -34,33 +57,36 @@ each_counts <- function(sce, feature) {
 }
 
 feature.plots <- purrr::map(markers, function(x) plot_expression(sce, x)) 
-enhanced.feature.plots_no_legend <- purrr::map(markers[1:2], function(x) plot_expression(sce_enhanced, x) + theme(legend.position = "none"))
-enhanced.feature.plots_w_legend <- purrr::map(markers[3], function(x) plot_expression(sce_enhanced, x))
-# enhanced.feature.plots_w_legend <- list(plot_expression(sce_enhanced, markers[3]))
-enhanced.feature.plots <- append(enhanced.feature.plots_no_legend, enhanced.feature.plots_w_legend)
+# enhanced.feature.plots_no_legend <- purrr::map(markers[1:4], function(x) plot_expression(sce_enhanced, x) + theme(legend.position = "none"))
+enhanced.feature.plots_w_legend <- purrr::map(markers, function(x) plot_expression(sce_enhanced, x))
+enhanced.feature.plots <- enhanced.feature.plots_w_legend # append(enhanced.feature.plots_no_legend, enhanced.feature.plots_w_legend)
 
 spot_feature_counts <- purrr::map(markers, function(x) each_counts(sce, x))
 subspot_feature_counts <- purrr::map(markers, function(x) each_counts(sce_enhanced, x))
 # -------------------------------------------------------------------------
-p1 <- patchwork::wrap_plots(feature.plots, ncol=3) + plot_layout(guides = "collect") & 
+p1 <- patchwork::wrap_plots(feature.plots, ncol = 6) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(spot_feature_counts)))
 
-# plot_title = "Spot_TLS_logexpr.pdf"
-# pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
-#     width = 8,
-#     height = 6)
-# print(p1)
-# dev.off()
-
-p2 <- patchwork::wrap_plots(enhanced.feature.plots, ncol=3) + plot_layout(guides = "collect") & 
+p2 <- patchwork::wrap_plots(enhanced.feature.plots, ncol = 6) + plot_layout(guides = "collect") & 
   scale_colour_continuous(limits = range(unlist(subspot_feature_counts)))
 
-# plot_title = "Subspot_TLS_logexpr.pdf"
-# pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig2e_TLS/", plot_title),
-#     width = 8,
-#     height = 6)
-# print(p2)
-# dev.off()
+
+
+# aggregate CD3 subtypes --------------------------------------------------
+sce$CD3_spot <- colSums(assay(sce, "log1p")[c("CD3E", "CD3D", "CD3G"), ])
+sce_enhanced$CD3_subspot <- colSums(assay(sce_enhanced, "log1p")[c("CD3E", "CD3D", "CD3G"), ])
+
+library(ggspavis)
+sce$pxl_col_in_fullres <- NULL
+sce$pxl_row_in_fullres <- NULL
+p_CD3 <- plotSpots(sce, annotate = "CD3_spot", x_coord = "pxl_col_in_fullres", y_coord = "pxl_row_in_fullres", pt.size = 1) + scale_colour_viridis_c(option = "magma") + theme(plot.title = element_blank()
+                                                                                                                                                                               , legend.position = "none")
+psub_CD3 <- plotSpots(sce_enhanced, annotate = "CD3_subspot", x_coord = "pxl_col_in_fullres", y_coord = "pxl_row_in_fullres", in_tissue = NULL) + scale_colour_viridis_c(option = "magma") + theme(plot.title = element_blank()
+                                                                                                                                                                                                   , legend.position = "none")
+
+psub_CD3 / p_CD3
+
+
 
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5"
 pdf(file = file.path(paste0(fig_path, "/L4/"),

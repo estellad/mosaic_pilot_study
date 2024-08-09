@@ -1,6 +1,6 @@
-# disease = "breast"
+disease = "breast"
 # disease = "lung"
-disease = "dlbcl"
+# disease = "dlbcl"
 source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/Owkin_Pilot/Code/Visium/Manuscript/01_params.R")
 source("/work/PRTNR/CHUV/DIR/rgottar1/spatial/env/ydong/Owkin_Pilot/Code/color_palette.R")
 
@@ -12,7 +12,7 @@ save_bs_path <- paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Interm
 
 vis_rawmat <- "counts"
 
-i = 1
+i = 4
 # for(i in 1:nsamples){
   if(disease == "breast"){
     chrom <- readRDS(file.path(chrompath, "chrom_breast_add_lung_healthy.rds"))
