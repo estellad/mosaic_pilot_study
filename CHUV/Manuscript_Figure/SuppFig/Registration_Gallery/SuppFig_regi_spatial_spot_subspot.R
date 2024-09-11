@@ -25,6 +25,12 @@ for(i in 1:length(samples_for_registration)){
   sce <- readRDS(file.path(paste0(regis_savepath, "/Visium_mapped_spot_obj"), paste0(samples_for_registration[i], "_mapped_spot.rds"))) # spot
   sce_subspot <- readRDS(file.path(paste0(regis_savepath, "/Visium_mapped_subspot_obj"), paste0(samples_for_registration[i], "_mapped_subspot.rds"))) # subspot
   
+  if(samples_for_registration[i] == "B1_2"){
+    sce_qcd <- readRDS("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/Visium_qcd/breast_qcd/B1_2_qcd.rds")
+    sce <- sce[, sce$barcode %in% sce_qcd$Barcode]
+    sce_subspot <- sce_subspot[, sce_subspot$barcode %in% sce_qcd$Barcode]
+  }
+  
   if(samples_for_registration[i] != "B1_2"){
     sce$Region_mapped <- ifelse(is.na(sce$Cell_fraction), NA, sce$Region)
     sce_subspot$Region_mapped <- ifelse(is.na(sce_subspot$Cell_fraction), NA, sce_subspot$Region)
@@ -32,6 +38,7 @@ for(i in 1:length(samples_for_registration)){
   
   y_rev = ifelse(samples_for_registration[i] == "B1_4", FALSE, TRUE)
   # Plotting ----------------------------------------------------------------
+  sce$Cell_fraction <- ifelse(sce$Cell_fraction == "T_cells", "T cells", sce$Cell_fraction)
   p1 <- plotSpots(sce, in_tissue = NULL, annotate = "Cell_fraction",
                   x_coord = "pxl_col_in_fullres", y_coord = "pxl_row_in_fullres", pt.size = 1, y_reverse = y_rev) + 
     scale_color_manual(values = cell_fraction_color[names(table(sce$Cell_fraction))], 
@@ -44,10 +51,10 @@ for(i in 1:length(samples_for_registration)){
                          na.value = "#d3d3d3") + labs(color = "Pathology")
   }
   
-  
+  sce_subspot$Cell_fraction <- ifelse(sce_subspot$Cell_fraction == "T_cells", "T cells", sce_subspot$Cell_fraction)
   p3 <- plotSpots(sce_subspot, in_tissue = NULL, annotate = "Cell_fraction",
                   x_coord = "pxl_col_in_fullres", y_coord = "pxl_row_in_fullres", y_reverse = y_rev) + 
-    scale_color_manual(values = cell_fraction_color[names(table(sce$Cell_fraction))],
+    scale_color_manual(values = cell_fraction_color[names(table(sce_subspot$Cell_fraction))],
                        na.value = "#d3d3d3") + labs(color = "Cell fraction")
   
   if(samples_for_registration[i] != "B1_2"){

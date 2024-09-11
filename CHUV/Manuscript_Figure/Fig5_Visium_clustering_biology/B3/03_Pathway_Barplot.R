@@ -3,12 +3,12 @@ library(enrichR)
 
 figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5/B3"
 
-contrast <- "1&5&9_14"
+contrast <- "ConsensusA_B"
 save_path_DE <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig_DE_Volcano/B3_2"
 DE_result <- read.csv(file.path(save_path_DE, paste0(contrast, ".csv")))
 results <- as.data.frame(DE_result)
 
-results <- results %>% filter(cluster == "1_5_9")
+results <- results %>% filter(cluster == "1_5_7_9_Consensus")
 gene_list <- results$gene # [1:100]
 
 databases <- c("KEGG_2021_Human", "MSigDB_Hallmark_2020", "MSigDB_Computational", "MSigDB_Oncogenic_Signatures")
@@ -43,9 +43,9 @@ p <- ggplot(data = enrichment_results_plt_df, aes(x=Term, y=Odds.Ratio, fill=-lo
         axis.text.x = element_text(size = 18),
         axis.text.y = element_text(size = 18),
         legend.position = "bottom"
-  ) # + ylim(0,30)
+  ) + ylim(0,15.5)
 
-plot_title = "Vis_B3_2_DE_Pathway_159.pdf"
+plot_title = "Vis_B3_2_DE_Pathway_159_consensus_final.pdf"
 pdf(file = file.path(figpath, plot_title),
     width = 8, 
     height = 5.5)
@@ -54,12 +54,12 @@ dev.off()
 
 
 # -------------------------------------------------------------------------
-contrast <- "1&5&9_14"
+contrast <- "ConsensusA_B"
 save_path_DE <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig_DE_Volcano/B3_2"
 DE_result <- read.csv(file.path(save_path_DE, paste0(contrast, ".csv")))
 results <- as.data.frame(DE_result)
 
-results <- results %>% filter(cluster == "14")
+results <- results %>% filter(cluster == "4_14_Consensus")
 gene_list <- results$gene # [1:100]
 
 databases <- c("KEGG_2021_Human", "MSigDB_Hallmark_2020", "MSigDB_Computational", "MSigDB_Oncogenic_Signatures")
@@ -94,10 +94,10 @@ p <- ggplot(data = enrichment_results_plt_df, aes(x=Term, y=Odds.Ratio, fill=-lo
         axis.text.x = element_text(size = 18),
         axis.text.y = element_text(size = 18),
         legend.position = "bottom"
-  ) + ylim(0,30)
+  ) + ylim(0,15.5)
 
 
-plot_title = "Vis_B3_2_DE_Pathway_14.pdf"
+plot_title = "Vis_B3_2_DE_Pathway_14_consensus_final.pdf"
 pdf(file = file.path(figpath, plot_title),
     width = 7,
     height = 5.5)

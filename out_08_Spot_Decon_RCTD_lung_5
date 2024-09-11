@@ -1,0 +1,227 @@
+[1] 5
+Loading required package: SingleCellExperiment
+Loading required package: SummarizedExperiment
+Loading required package: MatrixGenerics
+Loading required package: matrixStats
+
+Attaching package: ‘MatrixGenerics’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: BiocGenerics
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min
+
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:utils’:
+
+    findMatches
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+Attaching package: ‘Biobase’
+
+The following object is masked from ‘package:MatrixGenerics’:
+
+    rowMedians
+
+The following objects are masked from ‘package:matrixStats’:
+
+    anyMissing, rowMedians
+
+Warning message:
+replacing previous import ‘RcppML::nmf’ by ‘NMF::nmf’ when loading ‘CARD’ 
+[1] 5
+
+                          B_cell                   B_plasma_IGHA1 
+                            2094                             1134 
+                  B_plasma_IGHG1                   B_plasma_IGHG3 
+                            1563                              441 
+                   B_plasma_IGHM                    B_plasma_IGKC 
+                             352                             2374 
+                  B_plasma_IGLC1                             DC_1 
+                             399                              240 
+                            DC_2                     DC_activated 
+                            1166                              296 
+                           DC_pc              Endothelia_vascular 
+                             424                             1236 
+                        Epi_lung                       Fibroblast 
+                             648                             3177 
+                     Granulocyte                       Macrophage 
+                             187                             4848 
+                       Mast_cell                         Monocyte 
+                             567                             1772 
+                   Muscle_smooth                               NK 
+                            2157                              708 
+                        Pericyte                            T_CD4 
+                             484                             2305 
+                 T_CD8_exhausted                            T_CTL 
+                            1235                             3415 
+                        T_CXCL13                            T_reg 
+                             725                             3870 
+                    TNK_dividing     Tu_L4_KRT17_immune_signature 
+                             427                              404 
+              Tu_L4_KRT17_mucous             Tu_L4_KRT17_necrosis 
+                              81                              600 
+Tu_L4_KRT17_neutrophil_signature 
+                             322 
+Begin: process_cell_type_info
+process_cell_type_info: number of cells in reference: 39651
+process_cell_type_info: number of genes in reference: 18082
+
+                          B_cell                   B_plasma_IGHA1 
+                            2094                             1134 
+                  B_plasma_IGHG1                   B_plasma_IGHG3 
+                            1563                              441 
+                   B_plasma_IGHM                    B_plasma_IGKC 
+                             352                             2374 
+                  B_plasma_IGLC1                             DC_1 
+                             399                              240 
+                            DC_2                     DC_activated 
+                            1166                              296 
+                           DC_pc              Endothelia_vascular 
+                             424                             1236 
+                        Epi_lung                       Fibroblast 
+                             648                             3177 
+                     Granulocyte                       Macrophage 
+                             187                             4848 
+                       Mast_cell                         Monocyte 
+                             567                             1772 
+                   Muscle_smooth                               NK 
+                            2157                              708 
+                        Pericyte                            T_CD4 
+                             484                             2305 
+                 T_CD8_exhausted                            T_CTL 
+                            1235                             3415 
+                        T_CXCL13                            T_reg 
+                             725                             3870 
+                    TNK_dividing     Tu_L4_KRT17_immune_signature 
+                             427                              404 
+              Tu_L4_KRT17_mucous             Tu_L4_KRT17_necrosis 
+                              81                              600 
+Tu_L4_KRT17_neutrophil_signature 
+                             322 
+End: process_cell_type_info
+create.RCTD: getting regression differentially expressed genes: 
+get_de_genes: B_cell found DE genes: 312
+get_de_genes: B_plasma_IGHA1 found DE genes: 55
+get_de_genes: B_plasma_IGHG1 found DE genes: 110
+get_de_genes: B_plasma_IGHG3 found DE genes: 83
+get_de_genes: B_plasma_IGHM found DE genes: 56
+get_de_genes: B_plasma_IGKC found DE genes: 49
+get_de_genes: B_plasma_IGLC1 found DE genes: 74
+get_de_genes: DC_1 found DE genes: 315
+get_de_genes: DC_2 found DE genes: 325
+get_de_genes: DC_activated found DE genes: 448
+get_de_genes: DC_pc found DE genes: 358
+get_de_genes: Endothelia_vascular found DE genes: 432
+get_de_genes: Epi_lung found DE genes: 329
+get_de_genes: Fibroblast found DE genes: 276
+get_de_genes: Granulocyte found DE genes: 456
+get_de_genes: Macrophage found DE genes: 345
+get_de_genes: Mast_cell found DE genes: 277
+get_de_genes: Monocyte found DE genes: 376
+get_de_genes: Muscle_smooth found DE genes: 356
+get_de_genes: NK found DE genes: 270
+get_de_genes: Pericyte found DE genes: 384
+get_de_genes: T_CD4 found DE genes: 297
+get_de_genes: T_CD8_exhausted found DE genes: 302
+get_de_genes: T_CTL found DE genes: 304
+get_de_genes: T_CXCL13 found DE genes: 303
+get_de_genes: T_reg found DE genes: 286
+get_de_genes: TNK_dividing found DE genes: 321
+get_de_genes: Tu_L4_KRT17_immune_signature found DE genes: 451
+get_de_genes: Tu_L4_KRT17_mucous found DE genes: 517
+get_de_genes: Tu_L4_KRT17_necrosis found DE genes: 360
+get_de_genes: Tu_L4_KRT17_neutrophil_signature found DE genes: 416
+get_de_genes: total DE genes: 4138
+create.RCTD: getting platform effect normalization differentially expressed genes: 
+get_de_genes: B_cell found DE genes: 838
+get_de_genes: B_plasma_IGHA1 found DE genes: 112
+get_de_genes: B_plasma_IGHG1 found DE genes: 209
+get_de_genes: B_plasma_IGHG3 found DE genes: 160
+get_de_genes: B_plasma_IGHM found DE genes: 107
+get_de_genes: B_plasma_IGKC found DE genes: 114
+get_de_genes: B_plasma_IGLC1 found DE genes: 155
+get_de_genes: DC_1 found DE genes: 715
+get_de_genes: DC_2 found DE genes: 706
+get_de_genes: DC_activated found DE genes: 777
+get_de_genes: DC_pc found DE genes: 715
+get_de_genes: Endothelia_vascular found DE genes: 841
+get_de_genes: Epi_lung found DE genes: 661
+get_de_genes: Fibroblast found DE genes: 488
+get_de_genes: Granulocyte found DE genes: 1011
+get_de_genes: Macrophage found DE genes: 672
+get_de_genes: Mast_cell found DE genes: 581
+get_de_genes: Monocyte found DE genes: 755
+get_de_genes: Muscle_smooth found DE genes: 710
+get_de_genes: NK found DE genes: 714
+get_de_genes: Pericyte found DE genes: 780
+get_de_genes: T_CD4 found DE genes: 756
+get_de_genes: T_CD8_exhausted found DE genes: 752
+get_de_genes: T_CTL found DE genes: 763
+get_de_genes: T_CXCL13 found DE genes: 726
+get_de_genes: T_reg found DE genes: 745
+get_de_genes: TNK_dividing found DE genes: 914
+get_de_genes: Tu_L4_KRT17_immune_signature found DE genes: 1187
+get_de_genes: Tu_L4_KRT17_mucous found DE genes: 1296
+get_de_genes: Tu_L4_KRT17_necrosis found DE genes: 909
+get_de_genes: Tu_L4_KRT17_neutrophil_signature found DE genes: 1014
+get_de_genes: total DE genes: 7000
+fitBulk: decomposing bulk
+Step 2/4: Choose Sigma
+Multicore enabled using 2 cores
+  |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%8/8
+  |                                                                              |======================================================================| 100%
+starting worker pid=954892 on localhost:11305 at 17:26:43.133
+starting worker pid=954926 on localhost:11305 at 17:26:43.300
+Loading required package: spacexr
+loaded spacexr and set parent environment
+Loading required package: spacexr
+loaded spacexr and set parent environment

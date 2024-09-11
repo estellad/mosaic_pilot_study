@@ -47,6 +47,7 @@ mapped_all <- read.csv(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pi
 # Geo decon results (spot)
 # geo_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/Final_level1_5_decon_results"
 deconresultpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/GeoMx/For_level1_5_immune_decon_results"
+
 geo_decon <- rbind(read.csv(file.path(deconresultpath, "breast_batched_decon_long.csv")),
                    read.csv(file.path(deconresultpath, "lung_batched_decon_long.csv"))
                    # read.csv(file.path(geo_decon_path, "dlbcl_batched_decon_long.csv")) %>% rename(section_id = patient)
@@ -83,7 +84,13 @@ geo_decon_mapped$cell_fraction = ifelse(geo_decon_mapped$cell_fraction == "Macro
 # #                    read.csv(file.path(vis_decon_path, "vis_lung_decon_long_RCTD.csv"))
 # # )
 
-vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/Fig2_final_immune"
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/Fig2_final_immune" # CARD
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/cell2location_vis_long" # C2L
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/Manuscript_Figures/RCTD_vis_long" # RCTD - level 1.5 immune
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/AggLevel4/RCTD/level1_5_immune_long" # RCTD - level 4 combined to level 1.5 immunne 
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/AggLevel4/RCTD_DEgenes/level1_5_immune_long" # RCTD - level 4 DEgenes combined to level 1.5 immunne 
+vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/AggLevel4/C2L/level1_5_immune_long" # C2L - level 4 combined to level 1.5 immunne 
+# vis_decon_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Visium_Decon/AggLevel4/C2L_DEgenes/level1_5_immune_long" # C2L - level 4 DEgenes combined to level 1.5 immunne 
 decon_patho_gather_breast <- read.csv(file.path(vis_decon_path, "vis_breast_decon_immune_long.csv"))
 decon_patho_gather_lung <- read.csv(file.path(vis_decon_path, "vis_lung_decon_immune_long.csv"))
 
@@ -99,9 +106,10 @@ vis_decon <- rbind(decon_patho_gather_breast,
 
 vis_decon_mapped_ <- mapped_all %>%
   dplyr::rename(Barcode = barcode,
-         Section = Section_ID_Vis) %>%
-  left_join(vis_decon, by = c("Barcode", "Section")) %>%
-  filter(cell_fraction != "PanCK-")
+                Section = Section_ID_Vis) %>%
+  filter(cell_fraction != "PanCK-") %>%
+  left_join(vis_decon, by = c("Barcode", "Section"))
+
   
 vis_decon_mapped <- rbind(vis_decon_mapped_
                           #, vis_macro
@@ -136,8 +144,8 @@ vis_geo_spot_decon$CellType <- factor(
 
 # -------------------------------------------------------------------------
 # All mapped T cells spots are from breast, so no epithelia cell type, so remove it from T cells facet x axis by facet_wrap2(scales = "free_x")
-check <- gathered_df_breast_lung %>% filter(cell_fraction == "T cells")
-table(check$CellType)
+# check <- gathered_df_breast_lung %>% filter(cell_fraction == "T cells")
+# table(check$CellType)
 # Epithelia       Stroma        Tumor   Macrophage      T cells      B cells           NK Myeloid else 
 #   0            8            8            8            8            8            8            8 
 # vis_geo_spot_decon_ <- vis_geo_spot_decon
@@ -242,8 +250,66 @@ p <- ggplot(vis_geo_spot_decon, aes(x=CellType, y=Fraction, fill= Platform)) +
                                                                         fill = facet_fills)),
                      ncol = 4)
 
+library(rstatix)
+stat.test <- vis_geo_spot_decon %>%
+  filter(cell_fraction == "Malignant") %>%
+  group_by(CellType) %>%
+  t_test(Fraction ~ Platform) %>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")
+stat.test
+
+# CellType     .y.      group1 group2    n1    n2 statistic    df        p    p.adj p.adj.signif
+# <fct>        <chr>    <chr>  <chr>  <int> <int>     <dbl> <dbl>    <dbl>    <dbl> <chr>       
+#   1 Epithelia    Fraction GeoMx  Visium    17    73     -1.50  39.5 1.41e- 1 1   e+ 0 ns          
+#   2 Stroma       Fraction GeoMx  Visium    28   116     -3.39  74.4 1.12e- 3 8.96e- 3 **          
+#   3 Tumor        Fraction GeoMx  Visium    28   116      3.54  60.7 7.69e- 4 6.15e- 3 **          
+#   4 Macrophage   Fraction GeoMx  Visium    28   116     -1.07  80.7 2.88e- 1 1   e+ 0 ns          
+#   5 T cells      Fraction GeoMx  Visium    28   116      4.36  30.7 1.36e- 4 1.09e- 3 **          
+#   6 B cells      Fraction GeoMx  Visium    28   116     -8.04 139.  3.57e-13 2.86e-12 ****        
+#   7 NK           Fraction GeoMx  Visium    28   116     -4.03  73.1 1.37e- 4 1.10e- 3 **          
+#   8 Myeloid else Fraction GeoMx  Visium    28   116     -2.07  74.9 4.17e- 2 3.34e- 1 ns  
+
+stat.test <- vis_geo_spot_decon %>%
+  filter(cell_fraction == "Other") %>%
+  filter(CellType != "Epithelia") %>% # just one sample per platform
+  group_by(CellType) %>%
+  t_test(Fraction ~ Platform) %>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")
+stat.test
+
+# CellType     .y.      group1 group2    n1    n2 statistic    df        p    p.adj p.adj.signif
+# <fct>        <chr>    <chr>  <chr>  <int> <int>     <dbl> <dbl>    <dbl>    <dbl> <chr>       
+#   1 Stroma       Fraction GeoMx  Visium    28   342     16.1   64.4 3.27e-24 2.29e-23 ****        
+#   2 Tumor        Fraction GeoMx  Visium    28   342     -4.63  78.8 1.44e- 5 1.01e- 4 ***         
+#   3 Macrophage   Fraction GeoMx  Visium    28   342     -2.60  40.0 1.31e- 2 9.17e- 2 ns          
+#   4 T cells      Fraction GeoMx  Visium    28   342    -10.6   38.8 5.28e-13 3.70e-12 ****        
+#   5 B cells      Fraction GeoMx  Visium    28   342     -3.33  42.2 1.83e- 3 1.28e- 2 *           
+#   6 NK           Fraction GeoMx  Visium    28   342    -16.4  298.  1.72e-43 1.20e-42 ****        
+#   7 Myeloid else Fraction GeoMx  Visium    28   342    -12.9   49.8 1.61e-17 1.13e-16 ****    
+
+stat.test <- vis_geo_spot_decon %>%
+  filter(cell_fraction == "T cells") %>%
+  group_by(CellType) %>%
+  t_test(Fraction ~ Platform) %>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")
+stat.test
+
+# CellType     .y.      group1 group2    n1    n2 statistic    df      p p.adj p.adj.signif
+# <fct>        <chr>    <chr>  <chr>  <int> <int>     <dbl> <dbl>  <dbl> <dbl> <chr>       
+# 1 Stroma       Fraction GeoMx  Visium     3     5     1.48   5.96 0.189  1     ns          
+# 2 Tumor        Fraction GeoMx  Visium     3     5     0.221  5.99 0.833  1     ns          
+# 3 Macrophage   Fraction GeoMx  Visium     3     5    -1.18   5.09 0.291  1     ns          
+# 4 T cells      Fraction GeoMx  Visium     3     5    -0.411  5.91 0.695  1     ns          
+# 5 B cells      Fraction GeoMx  Visium     3     5     0.454  3.84 0.674  1     ns          
+# 6 NK           Fraction GeoMx  Visium     3     5    -0.888  4.25 0.422  1     ns          
+# 7 Myeloid else Fraction GeoMx  Visium     3     5    -2.73   5.86 0.0349 0.244 ns    
+
+
 fig_path <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig3"
-pdf(file = file.path(fig_path, "Vis_Geo_Regi_sbs_AOI_facet.pdf"),
+pdf(file = file.path(fig_path, "Vis_Geo_Regi_sbs_AOI_facet_Cell2location_final.pdf"),
     width = 10,
     height = 4.5)
 print(p)

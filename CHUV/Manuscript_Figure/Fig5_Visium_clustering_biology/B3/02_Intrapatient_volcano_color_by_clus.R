@@ -1,24 +1,24 @@
-contrast <- "1&5&9_14"
+contrast <- "ConsensusA_B"
 save_path_DE <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig_DE_Volcano/B3_2"
 DE_result <- read.csv(file.path(save_path_DE, paste0(contrast, ".csv")))
 
 results <- as.data.frame(DE_result)
 
-results$avg_log2FC <- ifelse(results$cluster == "14", -1 * results$avg_log2FC, results$avg_log2FC) # upper tissue location one
+results$avg_log2FC <- ifelse(results$cluster == "4_14_Consensus", -1 * results$avg_log2FC, results$avg_log2FC) # upper tissue location one
 results = results %>% arrange(p_val_adj)
 head(results)
 
 # Categorize results based on P-value & FDR for plotting
-results$Color[results$cluster == "1_5_9" & results$p_val_adj < 0.05] <- "Clus159_05"
-results$Color[results$cluster == "1_5_9" & results$p_val_adj < 0.01] <- "Clus159_01"
-results$Color[results$cluster == "14" & results$p_val_adj < 0.05] <- "Clus14_05"
-results$Color[results$cluster == "14" & results$p_val_adj < 0.01] <- "Clus14_01"
+results$Color[results$cluster == "1_5_7_9_Consensus" & results$p_val_adj < 0.05] <- "Clus159_05"
+results$Color[results$cluster == "1_5_7_9_Consensus" & results$p_val_adj < 0.01] <- "Clus159_01"
+results$Color[results$cluster == "4_14_Consensus" & results$p_val_adj < 0.05] <- "Clus14_05"
+results$Color[results$cluster == "4_14_Consensus" & results$p_val_adj < 0.01] <- "Clus14_01"
 
 results$Color <- factor(results$Color,
                         levels = c("Clus159_05", "Clus159_01",
                                    "Clus14_05", "Clus14_01"))
 
-top_n_genes = 12
+top_n_genes = 15
 # results$gene <- rownames(results)
 # pick top genes for either side of volcano to label
 # order genes for convenience:
@@ -56,11 +56,13 @@ p <- ggplot(results,
         axis.title = element_text(size = 20),
         axis.text = element_text(size = 20))
 
-
-plot_title = "Vis_B3_2_DE_Volcano_159_14_.pdf"
-pdf(file = paste0("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Poster_Figures/", plot_title),
-    width = 10,
-    height = 10)
+figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5/B3"
+# figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Poster_Figures/"
+  
+plot_title = "Vis_B3_2_DE_Volcano_Consensus_final_final.pdf"
+pdf(file = file.path(figpath, plot_title),
+    width = 11.5,
+    height = 12)
 print(p)
 dev.off()
 

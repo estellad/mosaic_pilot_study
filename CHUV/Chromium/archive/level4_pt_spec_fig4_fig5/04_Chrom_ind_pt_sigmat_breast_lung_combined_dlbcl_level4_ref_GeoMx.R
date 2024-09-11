@@ -48,6 +48,8 @@ getSigmat <- function(chrom, disease, pt_name = "L1"){
     LabeledCellType = chrom_pt$Harmonised_Level4
   )
   
+  #TODO: add DE gene selection (For Sabrina)
+  
   custom_mtx <- create_profile_matrix(mtx = chrom_pt@assays$RNA@counts,            # cell x gene count matrix
                                       cellAnnots = annot_df,  # cell annotations with cell type and cell name as columns 
                                       cellTypeCol = "LabeledCellType",  # column containing cell type

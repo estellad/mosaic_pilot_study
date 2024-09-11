@@ -14,10 +14,10 @@ figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript
 # )
 
 DLBCLnChromium_Marker_Gene_List <- c(
-  "MS4A1", "TNFRSF13C", "CD79B", "CD37", "CD19", 
+  "MS4A1", "TNFRSF13C", "CD79B", "CD37", "CD19", "BTK",
   "TUBB",  "CD47", "CD52", "CD38", "MAP2K1",
   "CD40", "BCL2L1", "TNFRSF8", "RARA", "TYK2", "TNFRSF10B",
-  "MEF2B", "NOP56", "MYO1G", "SEMA7A", "BTK", "FCRL5",
+  "MEF2B", "NOP56", "MYO1G", "SEMA7A", "FCRL5",
   "FCRL3", "BCL6", "BCL11A", "BCL2L11", "BCL7A")
 
 # Chromium ----------------------------------------------------------------
@@ -41,13 +41,25 @@ p_chrom <- DotPlot(
   chrom,
   features = rev(DLBCLnChromium_Marker_Gene_List)) + 
   coord_flip() + 
-  theme(axis.text.x = element_text(angle = 90, size = 8, hjust = 1, vjust = 0.5),
-        axis.title = element_blank(),
+  theme(axis.text.x = element_text(angle = 90, size = 10.5, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 12),
         axis.ticks = element_blank(),
+        axis.title = element_blank(),
         axis.line.y = element_blank()
         ,legend.position = "none"
         )
 
+# For legend
+p_chrom_legen <- DotPlot(
+  chrom,
+  features = rev(DLBCLnChromium_Marker_Gene_List)) + 
+  coord_flip() + 
+  theme(axis.text.x = element_text(angle = 90, size = 10.5, hjust = 1, vjust = 0.5),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.y = element_blank()
+        ,legend.position = "bottom"
+  )
 
 # Visium ------------------------------------------------------------------
 vispath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Data/Visium_integration_rep_owkin/Seurat5_SpCl1.4.1_final/dlbcl/spotclean/Results/"
@@ -63,13 +75,26 @@ p_vis <- DotPlot(
   vis,
   features = rev(DLBCLnChromium_Marker_Gene_List)) + 
   coord_flip() + 
-  theme(axis.text.x = element_text(angle = 90, size = 8, hjust = 1, vjust = 0.5),
+  theme(axis.text.x = element_text(angle = 90, size = 10.5, hjust = 1, vjust = 0.5),
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
         axis.line.y = element_blank()
         ,legend.position = "none"
         )
+
+# For legend
+p_vis_legen <- DotPlot(
+  vis,
+  features = rev(DLBCLnChromium_Marker_Gene_List)) +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 90, size = 8, hjust = 1, vjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.y = element_blank()
+        ,legend.position = "bottom"
+  )
 
 
 # GeoMx ----------------------------------------------------------------
@@ -82,26 +107,65 @@ p_geo <- DotPlot(
   geo,
   features = rev(DLBCLnChromium_Marker_Gene_List)) + 
   coord_flip() + 
-  theme(axis.text.x = element_text(angle = 90, size = 8, hjust = 1, vjust = 0.5),
+  theme(axis.text.x = element_text(angle = 90, size = 10.5, hjust = 1, vjust = 0.5),
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
         axis.line.y = element_blank()
         ,legend.position = "none"
-        )
-p_geo_ <- p_geo + scale_size(range = c(1, 8))
+        ) + scale_size(range = c(1, 9))
+
+# For legend
+p_geo_legen <- DotPlot(
+  geo,
+  features = rev(DLBCLnChromium_Marker_Gene_List)) +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 90, size = 10.5, hjust = 1, vjust = 0.5),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line.y = element_blank()
+        ,legend.position = "bottom"
+  ) + scale_size(range = c(1, 9))
 
 # Stitch plots ------------------------------------------------------------
 p_final <- p_chrom + theme(plot.margin = margin(0, 4, 0, 0.5)) + 
   p_vis + theme(plot.margin = margin(0, 4, 0, 4)) +
-  p_geo_ + theme(plot.margin = margin(0, 0.5, 0, 4)) +
-  plot_layout(widths = c(1.65, 1.05, 0.9))
+  p_geo + theme(plot.margin = margin(0, 0.5, 0, 4)) +
+  plot_layout(widths = c(1.65, 1.05, 0.93))
 
 # -------------------------------------------------------------------------
 # plot_title = "d_Three_Tech_Cluster_Dotplot_level2.pdf"
 plot_title = "d_Three_Tech_Cluster_Dotplot_level2_new_gene.pdf"
 pdf(file = file.path(figpath, plot_title),
-    width = 9.5,
-    height = 6)
+    width = 10.2,
+    height = 7.7)
 print(p_final)
 dev.off()
+
+# Legend chrom
+plot_title = "d_Three_Tech_Cluster_Dotplot_level2_new_gene_chrom_legend.pdf"
+pdf(file = file.path(figpath, plot_title),
+    width = 10,
+    height = 8)
+print(p_chrom_legen)
+dev.off()
+
+# Legend vis
+plot_title = "d_Three_Tech_Cluster_Dotplot_level2_new_gene_vis_legend.pdf"
+pdf(file = file.path(figpath, plot_title),
+    width = 10,
+    height = 8)
+print(p_vis_legen)
+dev.off()
+
+# Legend vis
+plot_title = "d_Three_Tech_Cluster_Dotplot_level2_new_gene_geo_legend.pdf"
+pdf(file = file.path(figpath, plot_title),
+    width = 10,
+    height = 8)
+print(p_geo_legen)
+dev.off()
+
+
+

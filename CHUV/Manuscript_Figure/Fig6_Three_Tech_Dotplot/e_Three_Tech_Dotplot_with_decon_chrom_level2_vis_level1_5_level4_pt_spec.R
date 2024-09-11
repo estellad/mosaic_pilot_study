@@ -46,7 +46,7 @@ p_chrom <- DotPlot(
 
 # Visium ------------------------------------------------------------------
 vispath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Data/Visium_integration_rep_owkin/Seurat5_SpCl1.4.1_final/dlbcl/spotclean/Results/"
-vis_small <- readRDS(file.path(vispath, "Dlbcl-merge-SCTpostSpotClean_small_fig6e_level1_5_level4_pt_spec.rds"))
+vis_small <- readRDS(file.path(vispath, "Dlbcl-merge-SCTpostSpotClean_small_fig6e_level1_5_level4_pt_spec_C2L.rds"))
 
 Idents(vis_small) <- factor(vis_small$new_annot, levels = c("Epithelia", "Stroma", "B cells", "Myeloid", "T/NK", 
                                             "Tu_D1", "Tu_D2", "Tu_D3", "Tu_D4", "Tu_D5", "Tu_D6"))
@@ -93,9 +93,9 @@ p_final <- p_chrom + theme(plot.margin = margin(0, 4, 0, 0.5)) +
 
 
 # -------------------------------------------------------------------------
-plot_title = "e_Three_Tech_Cluster_Dotplot_chrom_level2_vis_level1_5_level4_pt_spec.pdf"
+plot_title = "e_Three_Tech_Cluster_Dotplot_chrom_level2_vis_level1_5_level4_pt_spec_C2L.pdf"
 pdf(file = file.path(figpath, plot_title),
-    width = 8.2,
+    width = 9,
     height = 6)
 print(p_final)
 dev.off()

@@ -1,19 +1,19 @@
-contrast <- "1&5&9_14"
+contrast <- "TMEA_B"
 save_path_DE <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig_DE_Volcano/B3_2"
 DE_result <- read.csv(file.path(save_path_DE, paste0(contrast, ".csv")))
 
 results <- as.data.frame(DE_result)
 
-results$avg_log2FC <- ifelse(results$cluster == "14_TME", -1 * results$avg_log2FC, results$avg_log2FC) # upper tissue location one
+results$avg_log2FC <- ifelse(results$cluster == "4_14_TME", -1 * results$avg_log2FC, results$avg_log2FC) # upper tissue location one
 # results$avg_log2FC <- ifelse(results$cluster == "9", -1 * results$avg_log2FC, results$avg_log2FC)
 results = results %>% arrange(p_val_adj)
 head(results)
 
 # Categorize results based on P-value & FDR for plotting
-results$Color[results$cluster == "159_TME" & results$p_val_adj < 0.05] <- "Clus159_05"
-results$Color[results$cluster == "159_TME" & results$p_val_adj < 0.01] <- "Clus159_01"
-results$Color[results$cluster == "14_TME" & results$p_val_adj < 0.05] <- "Clus14_05"
-results$Color[results$cluster == "14_TME" & results$p_val_adj < 0.01] <- "Clus14_01"
+results$Color[results$cluster == "1_5_7_9_TME" & results$p_val_adj < 0.05] <- "Clus159_05"
+results$Color[results$cluster == "1_5_7_9_TME" & results$p_val_adj < 0.01] <- "Clus159_01"
+results$Color[results$cluster == "4_14_TME" & results$p_val_adj < 0.05] <- "Clus14_05"
+results$Color[results$cluster == "4_14_TME" & results$p_val_adj < 0.01] <- "Clus14_01"
 # results$Color[abs(results$avg_log2FC) < 0.5] <- "NS or FC < 0.5"
 results$Color <- factor(results$Color,
                         levels = c("Clus159_05", "Clus159_01",
@@ -42,9 +42,9 @@ p <- ggplot(results,
        y = expression("Significance, -log"[10]*"p-value"),
        color = "Significance") +
   scale_color_manual(values = c("Clus159_05" = "#fc98fc",
-                                "Clus159_01" = "#ff00ff",
+                                "Clus159_01" = "#AA336A",
                                 "Clus14_05" = "#9393ff",
-                                "Clus14_01" = "#0000ff"),
+                                "Clus14_01" = "#00008B"),
                      guide = guide_legend(override.aes = list(size = 4))) +
   scale_y_continuous(expand = expansion(mult = c(0,0.05))) +
   ggrepel::geom_text_repel(data = subset(results, gene %in% top_g & p_val_adj < 0.001),
@@ -59,11 +59,10 @@ p <- ggplot(results,
 
 figpath <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures_Final/Fig5/B3"
 
-plot_title = "Vis_B3_2_DE_Volcano_159_14_.pdf"
+plot_title = "Vis_B3_2_DE_Volcano_TME_final.pdf"
 pdf(file = file.path(figpath, plot_title),
-    width = 10,
-    height = 10)
+    width = 13,
+    height = 13)
 print(p)
 dev.off()
 
-# ggsave(file.path(file.path(out_dir, "volcanoplot.png")))
