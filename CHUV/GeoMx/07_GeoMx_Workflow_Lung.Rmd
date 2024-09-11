@@ -1,0 +1,303 @@
+---
+title: "GeoMx_Workflow"
+output: html_document
+date: "2023-11-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load library and path
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+absolute_path_cur <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/"
+source(paste0(absolute_path_cur, "env/ydong/Owkin_Pilot/Code/GeoMx/Manuscript/GeoMx_init.R"))
+read_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_test_norm/")
+# save_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_Final_Qcd/")
+library(ggspavis)
+library(patchwork)
+```
+
+# Read raw .dcc and LabWorksheets
+`GeomxTools::NanoStringGeoMxSet` object conversion to `SpatialExperiment`
+```{r}
+disease = "lung"
+spe <- readRDS(file.path(read_path, paste0(disease, ".rds")))
+# spe <- readRDS(file.path(save_path, paste0(disease, "_qcd.rds"))) 
+```
+
+# Normalization
+```{r, message=FALSE, results = FALSE}
+## scran Normalization
+library(scran)
+spe <- computeSumFactors(spe, assay.type="counts")
+data_norm_pre <- sweep(assays(spe)$counts, 2, spe$sizeFactor,'/')
+assays(spe, withDimnames=FALSE)$scrannormcounts <- log(data_norm_pre + 1)
+
+## logNormCounts - mean count normalization
+assays(spe, withDimnames=FALSE)$meannormcounts <- assay(logNormCounts(spe, assay.type = "counts"), "logcounts")
+
+## TMM
+spe_tmm <- geomxNorm(spe, method = "TMM", log = FALSE)
+assays(spe, withDimnames=FALSE)$tmmcounts <- assay(spe_tmm, "logcounts")
+
+## Upperquartile (Q3)
+spe_upperquatile <- geomxNorm(spe, method = "upperquartile", log = FALSE)
+assays(spe, withDimnames=FALSE)$upperquartile <- assay(spe_upperquatile, "logcounts")
+
+## Quantile
+assays(spe, withDimnames=FALSE)$quantile <- normalize.quantiles(assay(spe, "log1p")) # preprocessCore::normalize.quantile on top of log1p
+
+## scTransform
+assay(spe, "scTransform", withDimnames = FALSE) <- sctransform::vst(counts(spe), min_cells = 0)$y
+
+```
+
+RLE for two normalization methods. One replicate of L3 (L3_3) and L4 (L4_3) were removed by gene detection rate QC. All low signal AOIs were removed. 
+```{r, fig.width=12, fig.height=4}
+p <- plotRLExpr(spe, assay = "counts", color = slide_name) + ggtitle("Raw") + theme(legend.position = "none") |
+  plotRLExpr(spe, assay = "logcounts", color = slide_name) + ggtitle("logCPM") + theme(legend.position = "none") |
+  plotRLExpr(spe, assay = "quantile", color = slide_name) + ggtitle("Quantile")
+p
+```
+
+Check by sample, for breast are pretty well aligned.
+```{r, fig.width=12, fig.height=4}
+plotRLExpr(spe, assay = "counts", color = sample_ids) + ggtitle("Raw") + theme(legend.position = "none") |
+plotRLExpr(spe, assay = "logcounts", color = sample_ids) + ggtitle("logCPM") + theme(legend.position = "none") |
+  plotRLExpr(spe, assay = "quantile", color = sample_ids) + ggtitle("Quantile")
+```
+
+# PCA before batch correction
+For breast samples, we can see that even if quantile normalization scales the relative expression onto the same scale, there are still a bit of batch effect to be corrected. Admittedly, the slides are pretty well aligned even before batch correction.
+```{r, warning=FALSE}
+assay = 8
+which.assay = "quantile"
+
+set.seed(100)
+spe <- scater::runPCA(spe, assay.type = which.assay)
+set.seed(100)
+spe <- scater::runUMAP(spe, dimred = "PCA")
+set.seed(100)
+spe <- scater::runTSNE(spe, dimred = "PCA")
+```
+
+```{r, fig.width=11, fig.height = 4.3}
+plotDR(spe, dimred = "PCA", col = section_id) | plotDR(spe, dimred = "PCA", col = cell_fraction)
+```
+
+```{r, fig.width=11, fig.height = 4.3}
+plotDR(spe, dimred = "UMAP", col = section_id) | plotDR(spe, dimred = "UMAP", col = cell_fraction)
+```
+
+```{r, fig.width=11, fig.height = 4.3}
+plotDR(spe, dimred = "TSNE", col = section_id) | plotDR(spe, dimred = "TSNE", col = cell_fraction)
+```
+
+I propose to update manuscript **Figure 1c** to these three factors, slide (batch effect), segment (biology of interest), and sample (to show within patient replicates agreement after normalization). Maybe the change of slide and segment will not make it into the manuscript figure, but I keep them here for examining the effect of batch corrections. Also keep the GeoMx and Visium aesthetic in sync. 
+```{r, fig.width=2.5, fig.height=2.5, message=FALSE}
+p <- plotDimRed(spe, type = "PCA", annotate = "section_id", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Section")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_nobatch_PCA_section.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+
+p <- plotDimRed(spe, type = "PCA", annotate = "cell_fraction", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Cell fraction")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_nobatch_PCA_cellfraction.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+
+# p1 <- plotDR(spe, dimred = "PCA", col = Section_ID) + xlab("") + ylab("") + 
+#   theme(legend.position = "bottom", 
+#         legend.title=element_blank(), 
+#         axis.text.x = element_blank(),
+#         axis.text.y = element_blank(),
+#         # axis.ticks = element_blank(),
+#         panel.border = element_blank(),
+#         # plot.title = element_text(hjust = 0.5),
+#         axis.line.x = element_line(size = 0.5, linetype = "solid", colour = "black"),
+#         axis.line.y = element_line(size = 0.5, linetype = "solid", colour = "black")) + 
+#   ggtitle("Breast") 
+# p1
+```
+
+```{r, fig.width=12, fig.height = 4.5}
+p2 <- plotDR(spe, dimred = "PCA", col = slide_name) + xlab("PC_1") + ylab("PC_2") + 
+  theme(legend.position = "right", legend.title=element_blank(), plot.title = element_text(hjust = 0.5)) + ggtitle("Slide")
+p3 <- plotDR(spe, dimred = "PCA", col = cell_fraction) + xlab("PC_1") + ylab("PC_2") + 
+  theme(legend.position = "right", legend.title=element_blank(), plot.title = element_text(hjust = 0.5)) + ggtitle("Segment")
+
+p2 | p3
+```
+
+
+# UMAP before batch correction
+```{r, fig.width=2.5, fig.height=2.5}
+p <- plotDimRed(spe, type = "UMAP", annotate = "section_id", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Section")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_nobatch_UMAP_section.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+
+p <- plotDimRed(spe, type = "UMAP", annotate = "cell_fraction", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Cell fraction")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_nobatch_UMAP_cellfraction.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+
+# plotDR(spe, dimred = "UMAP", col = patient_id) 
+# | plotDR(spe, dimred = "UMAP", col = slide_name) | plotDR(spe, dimred = "UMAP", col = cell_fraction)
+```
+
+# Batch correction
+For lung, RUV k = 9 is enough. 
+```{r, fig.width=7, fig.height=7}
+# Batch correction --------------------------------------------------------
+spe <- findNCGs(spe, batch_name = "slide_name", top_n = 300)
+metadata(spe) |> names()
+
+## Max biology cluster distinction, and minimize batch distinction
+for(i in seq(9)){
+  spe_ruv <- geomxBatchCorrection(spe, factors = "cell_fraction", n_assay = assay,
+                                  NCGs = metadata(spe)$NCGs, k = i)
+  
+  print(plotPairPCA(spe_ruv, assay = "logcounts", n_dimension = 4, color = cell_fraction, title = paste0("k = ", i)))
+  
+}
+```
+
+# PCA after batch correction.
+Now slides are perfectly mixed in PC1 and PC2.
+```{r, fig.width=7, fig.height=7}
+spe_ruv <- geomxBatchCorrection(spe, factors = "cell_fraction", n_assay = assay,
+                                NCGs = metadata(spe)$NCGs, k = 9)
+set.seed(100)
+spe_ruv <- scater::runPCA(spe_ruv, assay.type = "logcounts")
+
+pca_results_ruv <- reducedDim(spe_ruv, "PCA")
+
+plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
+            color = cell_fraction, title = "RUV4, k = 9", n_dimension = 4)
+plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
+            color = slide_name, title = "RUV4, k = 9", n_dimension = 4)
+
+```
+
+In UMAP, biology well separated, and batch effect well mixed. 
+```{r, fig.width=11, fig.height=4.5}
+## UMAP after batch correction
+set.seed(100)
+spe_ruv <- scater::runUMAP(spe_ruv, dimred = "PCA")
+set.seed(100)
+spe_ruv <- scater::runTSNE(spe_ruv, dimred = "PCA")
+
+plotDR(spe_ruv, dimred = "UMAP", col = cell_fraction) |
+  plotDR(spe_ruv, dimred = "UMAP", col = slide_name)
+
+```
+
+After batch correction, more agreement between samples. But for manuscript, show the after norm but before batch PCA. This is PCA after batched.
+```{r, fig.width=2.5, fig.height=2.5, message=FALSE}
+
+p <- plotDimRed(spe_ruv, type = "PCA", annotate = "section_id", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Section")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_batch_PCA_section.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+```
+
+UMAP after batch
+```{r, fig.width=2.5, fig.height=2.5, message=FALSE}
+p <- plotDimRed(spe_ruv, type = "PCA", annotate = "cell_fraction", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title= element_text(size = 10),
+        # axis.text = element_blank(),
+        # axis.title = element_blank(),
+        # axis.line.x = element_blank(),
+        # axis.line.y = element_blank(),
+        # axis.ticks = element_blank(),
+        legend.key.size = unit(0.8, "lines")) +
+  # guides(color = guide_legend(nrow = 2, byrow = TRUE)) +
+  labs(color = "Cell fraction")  # + ggtitle("Lung")
+p
+pdf(file = "/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Results/Manuscript_Figures/Fig1d/geo_lung_batch_PCA_cellfraction.pdf",
+    width = 5,
+    height = 5)
+print(p)
+dev.off()
+```
+
+
+After batch correction, more agreement between samples. But for manuscript, show the after norm but before batch PCA. 
+```{r, fig.width=4.5, fig.height=5, message=FALSE}
+plotDimRed(spe_ruv, type = "UMAP", annotate = "section_id", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title=element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank()) + 
+  ggtitle("Lung - UMAP")
+```
+
+
+

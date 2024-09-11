@@ -1,0 +1,271 @@
+---
+title: "GeoMx_Workflow"
+output: html_document
+date: "2023-11-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load library and path
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+absolute_path_cur <- "/work/PRTNR/CHUV/DIR/rgottar1/spatial/"
+source(paste0(absolute_path_cur, "env/ydong/Owkin_Pilot/Code/GeoMx/Manuscript/GeoMx_init.R"))
+read_path <- paste0(absolute_path_cur, "Owkin_Pilot_Intermediate/GeoMx/GeoMx_test_norm/")
+
+library(ggspavis)
+library(patchwork)
+```
+
+# Read raw .dcc and LabWorksheets
+`GeomxTools::NanoStringGeoMxSet` object conversion to `SpatialExperiment`
+```{r}
+disease = "dlbcl"
+spe <- readRDS(file.path(read_path, paste0(disease, ".rds")))
+
+```
+
+# Normalization
+```{r, message=FALSE, results = FALSE}
+## scran Normalization
+library(scran)
+spe <- computeSumFactors(spe, assay.type="counts")
+data_norm_pre <- sweep(assays(spe)$counts, 2, spe$sizeFactor,'/')
+assays(spe, withDimnames=FALSE)$scrannormcounts <- log(data_norm_pre + 1)
+
+## logNormCounts - mean count normalization
+assays(spe, withDimnames=FALSE)$meannormcounts <- assay(logNormCounts(spe, assay.type = "counts"), "logcounts")
+
+## TMM
+spe_tmm <- geomxNorm(spe, method = "TMM", log = FALSE)
+assays(spe, withDimnames=FALSE)$tmmcounts <- assay(spe_tmm, "logcounts")
+
+## Upperquartile (Q3)
+spe_upperquatile <- geomxNorm(spe, method = "upperquartile", log = FALSE)
+assays(spe, withDimnames=FALSE)$upperquartile <- assay(spe_upperquatile, "logcounts")
+
+## Quantile
+assays(spe, withDimnames=FALSE)$quantile <- normalize.quantiles(assay(spe, "log1p")) # preprocessCore::normalize.quantile on top of log1p
+
+## scTransform
+assay(spe, "scTransform", withDimnames = FALSE) <- sctransform::vst(counts(spe), min_cells = 0)$y
+
+```
+
+RLE for two normalization methods. One replicate of L3 (L3_3) and L4 (L4_3) were removed by gene detection rate QC. All low signal AOIs were removed. 
+```{r, fig.width=12, fig.height=4}
+plotRLExpr(spe, assay = "counts", color = slide_name) + ggtitle("Raw") + theme(legend.position = "none") |
+plotRLExpr(spe, assay = "upperquartile", color = slide_name) + ggtitle("Q3") + theme(legend.position = "none") |
+  plotRLExpr(spe, assay = "quantile", color = slide_name) + ggtitle("Quantile")
+```
+
+Check by sample, for breast are pretty well aligned.
+```{r, fig.width=12, fig.height=4}
+plotRLExpr(spe, assay = "counts", color = patient) + ggtitle("Raw") + theme(legend.position = "none") |
+plotRLExpr(spe, assay = "upperquartile", color = patient) + ggtitle("Q3") + theme(legend.position = "none") |
+  plotRLExpr(spe, assay = "quantile", color = patient) + ggtitle("Quantile")
+```
+
+# PCA before batch correction
+For breast samples, we can see that even if quantile normalization scales the relative expression onto the same scale, there are still a bit of batch effect to be corrected. Admittedly, the slides are pretty well aligned even before batch correction.
+```{r, warning=FALSE}
+assay = 8
+which.assay = "quantile"
+
+# assay = 7
+# which.assay = "upperquartile"
+
+set.seed(100)
+spe <- scater::runPCA(spe, assay.type = which.assay)
+set.seed(100)
+spe <- scater::runUMAP(spe, dimred = "PCA")
+set.seed(100)
+spe <- scater::runTSNE(spe, dimred = "PCA")
+```
+
+I propose to update manuscript **Figure 1c** to these three factors, slide (batch effect), segment (biology of interest), and sample (to show within patient replicates agreement after normalization). Maybe the change of slide and segment will not make it into the manuscript figure, but I keep them here for examining the effect of batch corrections. Also keep the GeoMx and Visium aesthetic in sync. 
+```{r, fig.width=4.5, fig.height=5, message=FALSE}
+plotDimRed(spe, type = "PCA", annotate = "patient", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title=element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank()) + 
+  ggtitle("DLBCL")
+
+# p1 <- plotDR(spe, dimred = "PCA", col = Section_ID) + xlab("") + ylab("") + 
+#   theme(legend.position = "bottom", 
+#         legend.title=element_blank(), 
+#         axis.text.x = element_blank(),
+#         axis.text.y = element_blank(),
+#         # axis.ticks = element_blank(),
+#         panel.border = element_blank(),
+#         # plot.title = element_text(hjust = 0.5),
+#         axis.line.x = element_line(size = 0.5, linetype = "solid", colour = "black"),
+#         axis.line.y = element_line(size = 0.5, linetype = "solid", colour = "black")) + 
+#   ggtitle("Breast") 
+# p1
+```
+
+```{r, fig.width=12, fig.height = 3}
+p1 <- plotDR(spe, dimred = "PCA", col = patient) + xlab("PC_1") + ylab("PC_2") + 
+  theme(legend.position = "right", legend.title=element_blank(), plot.title = element_text(hjust = 0.5)) + ggtitle("Patient")
+p2 <- plotDR(spe, dimred = "PCA", col = slide_name) + xlab("PC_1") + ylab("PC_2") + 
+  theme(legend.position = "right", legend.title=element_blank(), plot.title = element_text(hjust = 0.5)) + ggtitle("Slide")
+p3 <- plotDR(spe, dimred = "PCA", col = cell_fraction) + xlab("PC_1") + ylab("PC_2") + 
+  theme(legend.position = "right", legend.title=element_blank(), plot.title = element_text(hjust = 0.5)) + ggtitle("Cell fraction")
+
+p1 | p2 | p3
+```
+
+# UMAP before batch correction
+For breast 
+```{r, fig.width=12, fig.height=3}
+plotDR(spe, dimred = "UMAP", col = patient) + xlab("UMAP_1") + ylab("UMAP_2") | 
+  plotDR(spe, dimred = "UMAP", col = slide_name) + xlab("UMAP_1") + ylab("UMAP_2") | 
+  plotDR(spe, dimred = "UMAP", col = cell_fraction) + xlab("UMAP_1") + ylab("UMAP_2")
+```
+
+# TSNE before batch correction
+```{r, fig.width=12, fig.height=3}
+plotDR(spe, dimred = "TSNE", col = patient) + xlab("TSNE_1") + ylab("TSNE_2") | 
+  plotDR(spe, dimred = "TSNE", col = slide_name) + xlab("TSNE_1") + ylab("TSNE_2") | 
+  plotDR(spe, dimred = "TSNE", col = cell_fraction) + xlab("TSNE_1") + ylab("TSNE_2")
+```
+
+# Batch correction
+For DLBCL, RUV k = 9 is enough. 
+```{r, fig.width=7, fig.height=7}
+# Batch correction --------------------------------------------------------
+spe <- findNCGs(spe, batch_name = "slide_name", top_n = 300)
+metadata(spe) |> names()
+
+## Max biology cluster distinction, and minimize batch distinction
+for(i in seq(9)){
+  spe_ruv <- geomxBatchCorrection(spe, factors = "cell_fraction", n_assay = assay,
+                                  NCGs = metadata(spe)$NCGs, k = i)
+  
+  print(plotPairPCA(spe_ruv, assay = "logcounts", n_dimension = 4, color = cell_fraction, title = paste0("k = ", i)))
+  
+}
+```
+
+# PCA after batch correction.
+Now slides are perfectly mixed in PC1 and PC2.
+```{r, fig.width=7, fig.height=7}
+spe_ruv <- geomxBatchCorrection(spe, factors = "cell_fraction", n_assay = assay,
+                                NCGs = metadata(spe)$NCGs, k = 9)
+set.seed(100)
+spe_ruv <- scater::runPCA(spe_ruv, assay.type = "logcounts")
+
+pca_results_ruv <- reducedDim(spe_ruv, "PCA")
+
+plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
+            color = cell_fraction, title = "RUV4, k = 9", n_dimension = 4)
+plotPairPCA(spe_ruv, assay = "logcounts", precomputed = pca_results_ruv, 
+            color = slide_name, title = "RUV4, k = 9", n_dimension = 4)
+
+```
+
+Run UMAP & TSNE
+```{r, fig.width=11, fig.height=4.5}
+## UMAP after batch correction
+set.seed(1)
+spe_ruv <- scater::runUMAP(spe_ruv, dimred = "PCA")
+set.seed(100)
+spe_ruv <- scater::runTSNE(spe_ruv, dimred = "PCA")
+```
+Run some clustering
+```{r}
+library(scran)
+set.seed(123)
+nn.clusters <- clusterCells(spe_ruv, use.dimred="PCA")
+table(nn.clusters)
+spe_ruv$graphbasedcluster <- nn.clusters
+```
+
+# PCA after batch correction
+```{r, fig.width=16, fig.height=3}
+plotDR(spe_ruv, dimred = "PCA", col = patient) + xlab("PCA_1") + ylab("PCA_2") | 
+  plotDR(spe_ruv, dimred = "PCA", col = slide_name) + xlab("PCA_1") + ylab("PCA_2") | 
+  plotDR(spe_ruv, dimred = "PCA", col = cell_fraction) + xlab("PCA_1") + ylab("PCA_2") |
+  plotDR(spe_ruv, dimred = "PCA", col = graphbasedcluster) + xlab("PCA_1") + ylab("PCA_2")
+```
+
+# UMAP after batch correction
+In UMAP, biology well separated, and batch effect well mixed. 
+```{r, fig.width=16, fig.height=3}
+plotDR(spe_ruv, dimred = "UMAP", col = patient) + xlab("UMAP_1") + ylab("UMAP_2") |
+plotDR(spe_ruv, dimred = "UMAP", col = slide_name) + xlab("UMAP_1") + ylab("UMAP_2") |
+  plotDR(spe_ruv, dimred = "UMAP", col = cell_fraction) + xlab("UMAP_1") + ylab("UMAP_2") |
+  plotDR(spe_ruv, dimred = "UMAP", col = graphbasedcluster) + xlab("UMAP_1") + ylab("UMAP_2")
+```
+
+# TSNE after batch correction
+```{r, fig.width=16, fig.height=3}
+plotDR(spe_ruv, dimred = "TSNE", col = patient) + xlab("TSNE_1") + ylab("TSNE_2") | 
+  plotDR(spe_ruv, dimred = "TSNE", col = slide_name) + xlab("TSNE_1") + ylab("TSNE_2") | 
+  plotDR(spe_ruv, dimred = "TSNE", col = cell_fraction) + xlab("TSNE_1") + ylab("TSNE_2") |
+  plotDR(spe_ruv, dimred = "TSNE", col = graphbasedcluster) + xlab("TSNE_1") + ylab("TSNE_2")
+```
+Save result of DLBCL clustering to the batch corrected object
+```{r}
+saveRDS(spe_ruv, file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/GeoMx/GeoMx_Normed_Batched/", paste0(disease, "_spe_ruv.rds")))
+```
+
+## DE analysis
+Read DLBCL clusters
+```{r}
+spe_ruv <- readRDS(file.path("/work/PRTNR/CHUV/DIR/rgottar1/spatial/Owkin_Pilot_Intermediate/GeoMx/GeoMx_Normed_Batched/", paste0(disease, "_spe_ruv.rds")))
+```
+
+Rename tumor types
+```{r}
+spe_ruv$clusters <- case_when(spe_ruv$graphbasedcluster == "1" ~ "T cells",
+                             spe_ruv$graphbasedcluster == "2" ~ "Macrophage",
+                             spe_ruv$graphbasedcluster == "4" ~ "Other",
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D1" ~ "Tu_D1", 
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D2" ~ "Tu_D2", 
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D3" ~ "Tu_D3", 
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D4" ~ "Tu_D4", 
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D5" ~ "Tu_D5", 
+                             spe_ruv$graphbasedcluster == "3" & spe_ruv$patient == "D6" ~ "Tu_D6"
+                             )
+
+```
+
+```{r}
+dlbcl_cluster_type <- c("T cells", "Macrophage", "Other", "Tu_D1", "Tu_D2", "Tu_D3", "Tu_D4", "Tu_D5", "Tu_D6")
+dlbcl_cluster_color <- c("#4169E1", "#9A32CD", "#388E8E", "#FF8C00", "#EEEE00", "#FFD700", "#A2CD5A", "#00EE76", "#ADFF2F")
+
+names(dlbcl_cluster_color) <- dlbcl_cluster_type
+```
+
+```{r}
+spe_ruv$clusters <- factor(spe_ruv$clusters, levels = dlbcl_cluster_type)
+```
+
+UMAP
+```{r, fig.width=7, fig.height=5}
+plotDR(spe_ruv, dimred = "UMAP", col = clusters) + xlab("UMAP_1") + ylab("UMAP_2") + 
+  scale_color_manual(values = dlbcl_cluster_color)
+```
+
+TSNE
+```{r, fig.width=7, fig.height=5}
+plotDR(spe_ruv, dimred = "TSNE", col = clusters) + xlab("TSNE_1") + ylab("TSNE_2") + 
+  scale_color_manual(values = dlbcl_cluster_color)
+```
+
+
+After batch correction, more agreement between samples. But for manuscript, show the after norm but before batch PCA. This is PCA after batched.
+```{r, fig.width=4.5, fig.height=5, message=FALSE}
+plotDimRed(spe_ruv, type = "PCA", annotate = "patient", pt.size = 1.5) + 
+  theme(legend.position = "bottom",
+        legend.title=element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank()) + 
+  ggtitle("DLBCL - PCA")
+```
+
+

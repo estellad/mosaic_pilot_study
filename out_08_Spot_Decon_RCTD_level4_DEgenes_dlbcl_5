@@ -1,0 +1,172 @@
+[1] 5
+Loading required package: SingleCellExperiment
+Loading required package: SummarizedExperiment
+Loading required package: MatrixGenerics
+Loading required package: matrixStats
+
+Attaching package: ‘MatrixGenerics’
+
+The following objects are masked from ‘package:matrixStats’:
+
+    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    colWeightedMeans, colWeightedMedians, colWeightedSds,
+    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    rowWeightedSds, rowWeightedVars
+
+Loading required package: GenomicRanges
+Loading required package: stats4
+Loading required package: BiocGenerics
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min
+
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:utils’:
+
+    findMatches
+
+The following objects are masked from ‘package:base’:
+
+    expand.grid, I, unname
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+Loading required package: Biobase
+Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+
+Attaching package: ‘Biobase’
+
+The following object is masked from ‘package:MatrixGenerics’:
+
+    rowMedians
+
+The following objects are masked from ‘package:matrixStats’:
+
+    anyMissing, rowMedians
+
+Warning message:
+replacing previous import ‘RcppML::nmf’ by ‘NMF::nmf’ when loading ‘CARD’ 
+[1] 5
+
+                  B_plasma                       DC_1 
+                        77                        291 
+                      DC_2                      DC_pc 
+                       445                        662 
+                Endothelia               Epi_bronchus 
+                       345                        121 
+                Epi_mucous Epi_Mucous_surface_gastric 
+                      1071                       1375 
+      Epi_parietal_gastric               Fibro_Muscle 
+                       378                       2954 
+                Mono_Macro                         NK 
+                      3075                        349 
+                  Pericyte                      T_CD4 
+                        89                       1084 
+                 T_CD4_reg                      T_CD8 
+                         9                       2384 
+                T_dividing                Tu_D5_CCL22 
+                       244                       1019 
+Begin: process_cell_type_info
+process_cell_type_info: number of cells in reference: 13138
+process_cell_type_info: number of genes in reference: 2745
+
+                  B_plasma                       DC_1 
+                        46                        268 
+                      DC_2                      DC_pc 
+                       373                        628 
+                Endothelia               Epi_bronchus 
+                       299                        106 
+                Epi_mucous Epi_Mucous_surface_gastric 
+                       878                       1225 
+      Epi_parietal_gastric               Fibro_Muscle 
+                       376                       2583 
+                Mono_Macro                         NK 
+                      2644                        295 
+                  Pericyte                      T_CD4 
+                        87                        676 
+                 T_CD4_reg                      T_CD8 
+                         6                       1435 
+                T_dividing                Tu_D5_CCL22 
+                       237                        976 
+End: process_cell_type_info
+create.RCTD: getting regression differentially expressed genes: 
+get_de_genes: B_plasma found DE genes: 169
+get_de_genes: DC_1 found DE genes: 191
+get_de_genes: DC_2 found DE genes: 220
+get_de_genes: DC_pc found DE genes: 205
+get_de_genes: Endothelia found DE genes: 307
+get_de_genes: Epi_bronchus found DE genes: 457
+get_de_genes: Epi_mucous found DE genes: 211
+get_de_genes: Epi_Mucous_surface_gastric found DE genes: 298
+get_de_genes: Epi_parietal_gastric found DE genes: 278
+get_de_genes: Fibro_Muscle found DE genes: 231
+get_de_genes: Mono_Macro found DE genes: 211
+get_de_genes: NK found DE genes: 207
+get_de_genes: Pericyte found DE genes: 368
+get_de_genes: T_CD4 found DE genes: 189
+get_de_genes: T_CD4_reg found DE genes: 362
+get_de_genes: T_CD8 found DE genes: 158
+get_de_genes: T_dividing found DE genes: 244
+get_de_genes: Tu_D5_CCL22 found DE genes: 286
+get_de_genes: total DE genes: 2363
+create.RCTD: getting platform effect normalization differentially expressed genes: 
+get_de_genes: B_plasma found DE genes: 259
+get_de_genes: DC_1 found DE genes: 251
+get_de_genes: DC_2 found DE genes: 313
+get_de_genes: DC_pc found DE genes: 257
+get_de_genes: Endothelia found DE genes: 403
+get_de_genes: Epi_bronchus found DE genes: 623
+get_de_genes: Epi_mucous found DE genes: 318
+get_de_genes: Epi_Mucous_surface_gastric found DE genes: 374
+get_de_genes: Epi_parietal_gastric found DE genes: 352
+get_de_genes: Fibro_Muscle found DE genes: 341
+get_de_genes: Mono_Macro found DE genes: 295
+get_de_genes: NK found DE genes: 291
+get_de_genes: Pericyte found DE genes: 514
+get_de_genes: T_CD4 found DE genes: 263
+get_de_genes: T_CD4_reg found DE genes: 395
+get_de_genes: T_CD8 found DE genes: 289
+get_de_genes: T_dividing found DE genes: 298
+get_de_genes: Tu_D5_CCL22 found DE genes: 336
+get_de_genes: total DE genes: 2524
+fitBulk: decomposing bulk
+Step 2/4: Choose Sigma
+Multicore enabled using 2 cores
+  |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%  |                                                                              |======================================================================| 100%
+starting worker pid=1984715 on localhost:11903 at 21:19:37.894
+starting worker pid=1984749 on localhost:11903 at 21:19:38.052
+Loading required package: spacexr
+loaded spacexr and set parent environment
+Loading required package: spacexr
+loaded spacexr and set parent environment
