@@ -99,6 +99,9 @@ decon_sub_long_fibro_macro$Area <- factor(decon_sub_long_fibro_macro$Area,
                                           levels = c("Area A", "Area B")) #, "Area A TME", "Area B TME"))
 decon_sub_long_fibro_macro$Fraction <- as.numeric(decon_sub_long_fibro_macro$Fraction)
 
+decon_sub_long_fibro_macro <- decon_sub_long_fibro_macro %>%
+  filter(CellType %in% c("Fibroblast", "Tu_B3_CYP4F8"))
+
 # decon_sub_long
 p <- ggplot(decon_sub_long_fibro_macro, aes(x=CellType, y=Fraction, fill= Area)) +
   geom_boxplot(outlier.size = 0.1) +
@@ -108,19 +111,22 @@ p <- ggplot(decon_sub_long_fibro_macro, aes(x=CellType, y=Fraction, fill= Area))
         panel.spacing=unit(1.5,"lines"),
         panel.grid = element_blank(),
         strip.text.x = element_text(size = 13.5, face = "bold"),
-        strip.background=element_rect(fill="#DEDEDE"))
+        strip.background=element_rect(fill="#DEDEDE")) + 
+  coord_flip()
 
 
 
 # T-test ------------------------------------------------------------------
 library(rstatix)
+
 stat.test_Consensus <- decon_sub_long_fibro_macro %>%
   # filter(spatial.cluster_merge_final_consensus_TME %in% c("4_14_Consensus", "1_5_7_9_Consensus")) %>%
   filter(spatial.cluster_merge_final_consensus_TME %in% c("14", "1_5_9")) %>%
   group_by(CellType) %>%
   t_test(Fraction ~ spatial.cluster_merge_final_consensus_TME) %>%
-  adjust_pvalue(method = "bonferroni") %>%
-  add_significance("p.adj")
+  add_significance()
+  # adjust_pvalue(method = "bonferroni") %>%
+  # add_significance("p.adj")
 stat.test_Consensus
 
 # CellType      .y.      group1         group2        n1    n2 statistic    df       p   p.adj p.adj.signif
