@@ -1,191 +1,0 @@
-[1] 3
-Loading required package: SingleCellExperiment
-Loading required package: SummarizedExperiment
-Loading required package: MatrixGenerics
-Loading required package: matrixStats
-
-Attaching package: ‘MatrixGenerics’
-
-The following objects are masked from ‘package:matrixStats’:
-
-    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
-    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
-    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
-    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
-    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
-    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
-    colWeightedMeans, colWeightedMedians, colWeightedSds,
-    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
-    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
-    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
-    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
-    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
-    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
-    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
-    rowWeightedSds, rowWeightedVars
-
-Loading required package: GenomicRanges
-Loading required package: stats4
-Loading required package: BiocGenerics
-
-Attaching package: ‘BiocGenerics’
-
-The following objects are masked from ‘package:stats’:
-
-    IQR, mad, sd, var, xtabs
-
-The following objects are masked from ‘package:base’:
-
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
-    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
-    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
-    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
-    table, tapply, union, unique, unsplit, which.max, which.min
-
-Loading required package: S4Vectors
-
-Attaching package: ‘S4Vectors’
-
-The following object is masked from ‘package:utils’:
-
-    findMatches
-
-The following objects are masked from ‘package:base’:
-
-    expand.grid, I, unname
-
-Loading required package: IRanges
-Loading required package: GenomeInfoDb
-Loading required package: Biobase
-Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    'browseVignettes()'. To cite Bioconductor, see
-    'citation("Biobase")', and for packages 'citation("pkgname")'.
-
-
-Attaching package: ‘Biobase’
-
-The following object is masked from ‘package:MatrixGenerics’:
-
-    rowMedians
-
-The following objects are masked from ‘package:matrixStats’:
-
-    anyMissing, rowMedians
-
-Warning message:
-replacing previous import ‘RcppML::nmf’ by ‘NMF::nmf’ when loading ‘CARD’ 
-[1] 3
-
-             B_cell      B_plasma_IGHA1      B_plasma_IGHG1      B_plasma_IGHG3 
-               2094                1134                1563                 441 
-      B_plasma_IGHM       B_plasma_IGKC      B_plasma_IGLC1                DC_1 
-                352                2374                 399                 240 
-               DC_2        DC_activated               DC_pc Endothelia_vascular 
-               1166                 296                 424                1236 
-         Fibroblast         Granulocyte          Macrophage           Mast_cell 
-               3177                 187                4848                 567 
-           Monocyte       Muscle_smooth                  NK            Pericyte 
-               1772                2157                 708                 484 
-              T_CD4     T_CD8_exhausted               T_CTL            T_CXCL13 
-               2305                1235                3415                 725 
-              T_reg        TNK_dividing               Tu_B2 
-               3870                 427                4691 
-Begin: process_cell_type_info
-process_cell_type_info: number of cells in reference: 42287
-process_cell_type_info: number of genes in reference: 18082
-
-             B_cell      B_plasma_IGHA1      B_plasma_IGHG1      B_plasma_IGHG3 
-               2094                1134                1563                 441 
-      B_plasma_IGHM       B_plasma_IGKC      B_plasma_IGLC1                DC_1 
-                352                2374                 399                 240 
-               DC_2        DC_activated               DC_pc Endothelia_vascular 
-               1166                 296                 424                1236 
-         Fibroblast         Granulocyte          Macrophage           Mast_cell 
-               3177                 187                4848                 567 
-           Monocyte       Muscle_smooth                  NK            Pericyte 
-               1772                2157                 708                 484 
-              T_CD4     T_CD8_exhausted               T_CTL            T_CXCL13 
-               2305                1235                3415                 725 
-              T_reg        TNK_dividing               Tu_B2 
-               3870                 427                4691 
-End: process_cell_type_info
-create.RCTD: getting regression differentially expressed genes: 
-get_de_genes: B_cell found DE genes: 289
-get_de_genes: B_plasma_IGHA1 found DE genes: 51
-get_de_genes: B_plasma_IGHG1 found DE genes: 110
-get_de_genes: B_plasma_IGHG3 found DE genes: 76
-get_de_genes: B_plasma_IGHM found DE genes: 51
-get_de_genes: B_plasma_IGKC found DE genes: 47
-get_de_genes: B_plasma_IGLC1 found DE genes: 71
-get_de_genes: DC_1 found DE genes: 317
-get_de_genes: DC_2 found DE genes: 329
-get_de_genes: DC_activated found DE genes: 441
-get_de_genes: DC_pc found DE genes: 352
-get_de_genes: Endothelia_vascular found DE genes: 435
-get_de_genes: Fibroblast found DE genes: 273
-get_de_genes: Granulocyte found DE genes: 433
-get_de_genes: Macrophage found DE genes: 351
-get_de_genes: Mast_cell found DE genes: 271
-get_de_genes: Monocyte found DE genes: 366
-get_de_genes: Muscle_smooth found DE genes: 359
-get_de_genes: NK found DE genes: 241
-get_de_genes: Pericyte found DE genes: 380
-get_de_genes: T_CD4 found DE genes: 260
-get_de_genes: T_CD8_exhausted found DE genes: 273
-get_de_genes: T_CTL found DE genes: 265
-get_de_genes: T_CXCL13 found DE genes: 266
-get_de_genes: T_reg found DE genes: 249
-get_de_genes: TNK_dividing found DE genes: 303
-get_de_genes: Tu_B2 found DE genes: 432
-get_de_genes: total DE genes: 3619
-create.RCTD: getting platform effect normalization differentially expressed genes: 
-get_de_genes: B_cell found DE genes: 800
-get_de_genes: B_plasma_IGHA1 found DE genes: 118
-get_de_genes: B_plasma_IGHG1 found DE genes: 216
-get_de_genes: B_plasma_IGHG3 found DE genes: 162
-get_de_genes: B_plasma_IGHM found DE genes: 111
-get_de_genes: B_plasma_IGKC found DE genes: 112
-get_de_genes: B_plasma_IGLC1 found DE genes: 170
-get_de_genes: DC_1 found DE genes: 716
-get_de_genes: DC_2 found DE genes: 691
-get_de_genes: DC_activated found DE genes: 774
-get_de_genes: DC_pc found DE genes: 711
-get_de_genes: Endothelia_vascular found DE genes: 853
-get_de_genes: Fibroblast found DE genes: 500
-get_de_genes: Granulocyte found DE genes: 984
-get_de_genes: Macrophage found DE genes: 686
-get_de_genes: Mast_cell found DE genes: 570
-get_de_genes: Monocyte found DE genes: 762
-get_de_genes: Muscle_smooth found DE genes: 720
-get_de_genes: NK found DE genes: 657
-get_de_genes: Pericyte found DE genes: 788
-get_de_genes: T_CD4 found DE genes: 707
-get_de_genes: T_CD8_exhausted found DE genes: 703
-get_de_genes: T_CTL found DE genes: 706
-get_de_genes: T_CXCL13 found DE genes: 674
-get_de_genes: T_reg found DE genes: 697
-get_de_genes: TNK_dividing found DE genes: 905
-get_de_genes: Tu_B2 found DE genes: 933
-get_de_genes: total DE genes: 6231
-fitBulk: decomposing bulk
-Step 2/4: Choose Sigma
-Multicore enabled using 2 cores
-  |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==========================                                            |  38%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%  |                                                                              |=============================================================         |  88%8/8
-  |                                                                              |======================================================================| 100%
-starting worker pid=978868 on localhost:11353 at 17:40:55.163
-starting worker pid=978902 on localhost:11353 at 17:40:55.278
-Loading required package: spacexr
-loaded spacexr and set parent environment
-Loading required package: spacexr
-loaded spacexr and set parent environment
-8/8
-  |                                                                              |======================================================================| 100%
-starting worker pid=3124939 on localhost:11713 at 17:41:33.315
-starting worker pid=3124973 on localhost:11713 at 17:41:33.473
-Loading required package: spacexr
-loaded spacexr and set parent environment
-Loading required package: spacexr
-loaded spacexr and set parent environment

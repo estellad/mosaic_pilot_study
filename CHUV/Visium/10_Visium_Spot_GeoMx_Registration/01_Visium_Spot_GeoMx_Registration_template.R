@@ -194,12 +194,5 @@ for(i in 1:length(samples_for_registration)){
 
 
 
-# spot
-# table(final_spot$ROI.ID, final_spot$Cell_fraction) # note non of the macrophages are mapped over. 
 
-# # number of AOIs per ROI. for each type of AOI, just one AOI per ROI. 
-# # But the shape of the AOI can be not continuous, so feels like 
-# owkinLW <- owkinLW %>%
-#   left_join(spotmatch_small)
-# table(owkinLW$ROI.ID, owkinLW$Cell_fraction)
 
