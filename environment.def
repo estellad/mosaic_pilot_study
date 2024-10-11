@@ -1,0 +1,10 @@
+BootStrap: localimage
+From: /scratch/ydong2/containers/rserver_sk_master_noglmGamPoi_mosaicpaper.sif
+
+%post
+R --slave -e 'remove.packages("glmGamPoi")'
+
+%environment
+  # R looking for user libraries in the (system) home folder
+  # interferes with some packages (e.g. SeuratDisk).
+  export R_LIBS_USER="ignore"
