@@ -8,8 +8,9 @@ postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
 
 # Load the Seurat object if not already loaded
 soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_with_Level1_2.rds"))
+Idents(soup.merge) <- "annot"
 
-# add granularity to T cells
+# Add granularity to T cells
 t_cell_cluster <- subset(soup.merge, idents = c("CD4_T","CD8_T"))
 unique(t_cell_cluster@meta.data$annot_l1)
 
@@ -50,13 +51,13 @@ FeaturePlot(t_cell_cluster, c("GNLY","NKG7","NCR1","KLRF1"), label = T)
 #6 - Proliferating
 FeaturePlot(t_cell_cluster, c("MKI67","TOP2A"), label = T)
 
-new.t.cluster.ids <- c("T_regs",
-                       "CTL",
+new.t.cluster.ids <- c("T_reg",
+                       "T_CTL",
                        "T_CD4",
                        "T_CD8_exhausted",
                        "T_CXCL13",
                        "NK",
-                       "Proliferating")
+                       "TNK_dividing")
 
 names(new.t.cluster.ids) <- levels(t_cell_cluster)
 t_cell_cluster <- RenameIdents(t_cell_cluster, new.t.cluster.ids)
@@ -66,12 +67,12 @@ t_cell_cluster[["annot_t"]] <- Idents(t_cell_cluster)
 soup.merge[["annot_l2"]] <- as.character(soup.merge@meta.data$annot_l1)
 for (i in colnames(t_cell_cluster)) {
   if (i %in% rownames(soup.merge[["annot_l1"]])) {
-    soup.merge@meta.data[i,"annot_l2"] <- as.character(t_cell_cluster@meta.data[i,"annot_t"])
+    soup.merge@meta.data[i,"Level3"] <- as.character(t_cell_cluster@meta.data[i,"annot_t"])
   }
 }
-soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
+soup.merge@meta.data$Level3 <- as.factor(soup.merge@meta.data$Level3)
 
-# add granularity to myeloid cells
+# Add granularity to myeloid cells
 myeloid_cell_cluster <- subset(soup.merge, idents = c("Myeloid cells","Macrophages"))
 
 myeloid_cell_cluster = RunPCA(myeloid_cell_cluster, assay = "SCT", npcs = 50)
@@ -125,5 +126,3 @@ soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
 
 DimPlot(soup.merge, group.by = "annot_l2", label = T)
 FeaturePlot(soup.merge, c('MUC5AC', 'TSPAN8','CYP2F1', 'CEACAM5',  'VSIG2', 'FUT6'))
-
-# B_plasma
