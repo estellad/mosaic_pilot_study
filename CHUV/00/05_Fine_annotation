@@ -8,7 +8,7 @@ postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
 
 # Load the Seurat object if not already loaded
 soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_with_Level1_2.rds"))
-Idents(soup.merge) <- "annot"
+Idents(soup.merge) <- "annot_l1"
 
 # Add granularity to T cells
 t_cell_cluster <- subset(soup.merge, idents = c("CD4_T","CD8_T"))
@@ -124,5 +124,5 @@ for (i in colnames(myeloid_cell_cluster)) {
 }
 soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
 
-DimPlot(soup.merge, group.by = "annot_l2", label = T)
+DimPlot(soup.merge, group.by = "Level3", label = T)
 FeaturePlot(soup.merge, c('MUC5AC', 'TSPAN8','CYP2F1', 'CEACAM5',  'VSIG2', 'FUT6'))
