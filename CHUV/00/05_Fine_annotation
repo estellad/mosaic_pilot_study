@@ -8,3 +8,122 @@ postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
 
 # Load the Seurat object if not already loaded
 soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_with_Level1_2.rds"))
+
+# add granularity to T cells
+t_cell_cluster <- subset(soup.merge, idents = c("CD4_T","CD8_T"))
+unique(t_cell_cluster@meta.data$annot_l1)
+
+t_cell_cluster = RunPCA(t_cell_cluster, assay = "SCT", npcs = 50)
+t_cell_cluster = RunUMAP(t_cell_cluster, assay = "SCT", reduction = "pca", dims = 1:50)
+ElbowPlot(t_cell_cluster, ndims=50)
+t_cell_cluster = FindNeighbors(t_cell_cluster, dims = 1:6) %>% FindClusters(resolution = 0.175)
+
+DimPlot(t_cell_cluster,
+        group.by = "SCT_snn_res.0.15",
+        label = T
+        )
+
+DimPlot(t_cell_cluster,
+        group.by = "sample_id",
+        label = T
+        )
+
+t_cell_cluster = PrepSCTFindMarkers(t_cell_cluster)
+t.cell.markers = FindAllMarkers(t_cell_cluster,only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, verbose = T)
+t.cell.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+
+
+#0 - T_regs
+FeaturePlot(t_cell_cluster, c("FOXP3", "CTLA4", "IL2RA"), label = T)
+#1 - CTL
+FeaturePlot(t_cell_cluster, c("GZMK", "GZMA","KLRG1","EOMES","CD8A"), label = T)
+#2 - T_CD4
+FeaturePlot(t_cell_cluster, c("IL7R","CD4","CCR7","LEF1","CCR4","CD40LG"), label = T)
+#3 - T_CD8_exhausted
+FeaturePlot(t_cell_cluster, c("PDCD1","LAG3","TIGIT","HAVCR2","SARDH","GZMB"), label = T)
+#4 - T_CXCL13
+FeaturePlot(t_cell_cluster, c("CXCL13"), label = T)
+#5 -NK cells  
+FeaturePlot(t_cell_cluster, c("GNLY","NKG7","NCR1","KLRF1"), label = T)
+#6 - Proliferating
+FeaturePlot(t_cell_cluster, c("MKI67","TOP2A"), label = T)
+
+new.t.cluster.ids <- c("T_regs",
+                       "CTL",
+                       "T_CD4",
+                       "T_CD8_exhausted",
+                       "T_CXCL13",
+                       "NK",
+                       "Proliferating")
+
+names(new.t.cluster.ids) <- levels(t_cell_cluster)
+t_cell_cluster <- RenameIdents(t_cell_cluster, new.t.cluster.ids)
+DimPlot(t_cell_cluster, label=T)
+t_cell_cluster[["annot_t"]] <- Idents(t_cell_cluster)
+
+soup.merge[["annot_l2"]] <- as.character(soup.merge@meta.data$annot_l1)
+for (i in colnames(t_cell_cluster)) {
+  if (i %in% rownames(soup.merge[["annot_l1"]])) {
+    soup.merge@meta.data[i,"annot_l2"] <- as.character(t_cell_cluster@meta.data[i,"annot_t"])
+  }
+}
+soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
+
+# add granularity to myeloid cells
+myeloid_cell_cluster <- subset(soup.merge, idents = c("Myeloid cells","Macrophages"))
+
+myeloid_cell_cluster = RunPCA(myeloid_cell_cluster, assay = "SCT", npcs = 50)
+myeloid_cell_cluster = RunUMAP(myeloid_cell_cluster, assay = "SCT", reduction = "pca", dims = 1:50)
+ElbowPlot(myeloid_cell_cluster, ndims=50)
+myeloid_cell_cluster = FindNeighbors(myeloid_cell_cluster, dims = 1:6) %>% FindClusters(resolution = 0.2)
+
+DimPlot(myeloid_cell_cluster,
+        group.by = "seurat_clusters",
+        label = T
+        )
+DimPlot(myeloid_cell_cluster,
+        group.by = "sample_id",
+        label = T
+        )
+
+myeloid_cell_cluster = PrepSCTFindMarkers(myeloid_cell_cluster)
+myeloid.cell.markers = FindAllMarkers(myeloid_cell_cluster,only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, verbose = T)
+myeloid.cell.markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+
+#0 - Macrophage_1
+FeaturePlot(myeloid_cell_cluster, c("APOE", "MARCO", "C1QA", "C1QB"), label = T)
+#1 - Monocytes
+FeaturePlot(myeloid_cell_cluster, c("VCAN","S100A8","CD300E"), label = T)
+#2 - Myeloid_mix
+#3 - Macrophage_2
+FeaturePlot(myeloid_cell_cluster, c("MARCO","SPP1"), label = T)
+#4 - DC_1
+FeaturePlot(myeloid_cell_cluster, c("WDFY4", "CLEC9A", "XCR1"), label = T)
+
+new.myeloid.cluster.ids <- c("Macrophage_1",
+                       "Monocytes",
+                       "Myeloid_mix",
+                       "Macrophage_2",
+                       "DC_1")
+
+names(new.myeloid.cluster.ids) <- levels(myeloid_cell_cluster)
+myeloid_cell_cluster <- RenameIdents(myeloid_cell_cluster, new.myeloid.cluster.ids)
+DimPlot(myeloid_cell_cluster, label=T)
+myeloid_cell_cluster[["annot_m"]] <- Idents(myeloid_cell_cluster)
+
+soup.merge[["annot_l2"]] <- as.character(soup.merge@meta.data$annot_l2)
+for (i in colnames(myeloid_cell_cluster)) {
+  if (i %in% rownames(soup.merge[["annot_l1"]])) {
+    soup.merge@meta.data[i,"annot_l2"] <- as.character(myeloid_cell_cluster@meta.data[i,"annot_m"])
+  }
+}
+soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
+
+DimPlot(soup.merge, group.by = "annot_l2", label = T)
+FeaturePlot(soup.merge, c('MUC5AC', 'TSPAN8','CYP2F1', 'CEACAM5',  'VSIG2', 'FUT6'))
+
+# B_plasma
