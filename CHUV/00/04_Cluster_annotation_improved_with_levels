@@ -66,18 +66,28 @@ level2_labels <-    c("T_NK",           # Label cluster 0 as CD4+ T cells
 
 # Assign the Level1 labels based on the cluster identities
 names(level1_labels) <- levels(soup.merge)
+soup.merge <- RenameIdents(soup.merge, level1_labels)
+# Add annotation as a new column in meta.data
+soup.merge[["Level1"]] <- Idents(soup.merge)
 
-# Add the new Level1 annotation as a metadata column
-soup.merge$Level1 <- plyr::mapvalues(x = Idents(soup.merge), from = names(level1_labels), to = level1_labels)
+names(level2_labels) <- levels(soup.merge)
+soup.merge <- RenameIdents(soup.merge, level2_labels)
+# Add annotation as a new column in meta.data
+soup.merge[["Level2"]] <- Idents(soup.merge)
 
 # Save the updated Seurat object with the new Level1 annotation
-saveRDS(soup.merge, file.path(postSoupX_path, "annotated_merged_with_Level1.rds"))
+saveRDS(soup.merge, file.path(postSoupX_path, "annotated_merged_with_Level1_2.rds"))
 
 # Check the new annotation and visualize
 table(soup.merge$Level1)  # View the distribution of cells in the new Level1 groups
 DimPlot(soup.merge, group.by = "Level1", label = TRUE)
 
+# Check the new annotation and visualize
+table(soup.merge$Level2)  # View the distribution of cells in the new Level1 groups
+DimPlot(soup.merge, group.by = "Level2", label = TRUE)
+
 # Save a plot showing the Level1 annotations
-pdf(file.path(postSoupX_path, "Level1_clusters.pdf"))
+pdf(file.path(postSoupX_path, "Level1_2_clusters.pdf"))
 DimPlot(soup.merge, group.by = "Level1", label = TRUE)
+DimPlot(soup.merge, group.by = "Level2", label = TRUE)
 dev.off()
