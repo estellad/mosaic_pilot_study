@@ -1,3 +1,8 @@
+# Load required libraries
+library(Seurat)
+library(ggplot2)
+library(dplyr)
+
 # Set the common path for postSoupX files
 postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
 
