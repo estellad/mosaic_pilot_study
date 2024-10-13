@@ -3,6 +3,9 @@ library(Seurat)
 library(plyr)
 library(ggplot2)
 
+# Set the common path for postSoupX files
+postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
+
 # Load the Seurat object if not already loaded
 soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_clustered.rds"))
 
