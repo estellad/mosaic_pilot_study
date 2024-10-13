@@ -1,0 +1,53 @@
+# Load required libraries
+library(Seurat)
+library(plyr)
+library(ggplot2)
+
+# Load the Seurat object if not already loaded
+soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_clustered.rds"))
+
+# Define the new Level1 grouping based on the annotations
+level1_labels <- c("T_NK",          # CD4_T
+                   "Stroma",        # Fibro_muscle
+                   "Myeloid",       # Myeloid cells
+                   "T_NK",          # CD8_T
+                   "Myeloid",       # Macrophages
+                   "Tumor_Breast",  # tumour_B2
+                   "B",             # B cells
+                   "B",             # Plasma cells
+                   "B",             # Plasma cells
+                   "Tumor_Breast",  # tumour_L4
+                   "Epithelia",     # Endothelia
+                   "Stroma",        # Fibro_muscle
+                   "Tumor_Breast",  # tumour_B1
+                   "Tumor_Breast",  # tumour_B4
+                   "Granulocyte",   # Mast cells
+                   "B",             # Plasma cells
+                   "Stroma",        # Alveolar type 2
+                   "Tumor_Lung",    # tumour_L3
+                   "Tumor_Lung",    # tumour_L2
+                   "B",             # Plasma cells
+                   "B",             # Plasma cells
+                   "B",             # Plasma cells
+                   "Myeloid",       # DC_plasmacytoid
+                   "Tumor_Lung",    # tumour_L1
+                   "Myeloid",       # DC_activated
+                   "Tumor_Breast")  # additional cell cluster mappings if required
+
+# Assign the Level1 labels based on the cluster identities
+names(level1_labels) <- levels(soup.merge)
+
+# Add the new Level1 annotation as a metadata column
+soup.merge$Level1 <- plyr::mapvalues(x = Idents(soup.merge), from = names(level1_labels), to = level1_labels)
+
+# Save the updated Seurat object with the new Level1 annotation
+saveRDS(soup.merge, file.path(postSoupX_path, "annotated_merged_with_Level1.rds"))
+
+# Check the new annotation and visualize
+table(soup.merge$Level1)  # View the distribution of cells in the new Level1 groups
+DimPlot(soup.merge, group.by = "Level1", label = TRUE)
+
+# Save a plot showing the Level1 annotations
+pdf(file.path(postSoupX_path, "Level1_clusters.pdf"))
+DimPlot(soup.merge, group.by = "Level1", label = TRUE)
+dev.off()
