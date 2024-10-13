@@ -8,6 +8,7 @@ postSoupX_path <- "/users/dbuszta/owkin_manuscript/results/"
 
 # Load the Seurat object if not already loaded
 soup.merge <- readRDS(file.path(postSoupX_path, "annotated_merged_with_Level1_2.rds"))
+Idents(soup.merge) <- "seurat_clusters"
 
  # Define the new Level2 grouping based on the annotations
 level3_labels <-    c("T_NK",           # Label cluster 0 as CD4+ T cells
