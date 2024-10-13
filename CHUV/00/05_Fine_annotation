@@ -73,56 +73,88 @@ for (i in colnames(t_cell_cluster)) {
 soup.merge@meta.data$Level3 <- as.factor(soup.merge@meta.data$Level3)
 
 # Add granularity to myeloid cells
-myeloid_cell_cluster <- subset(soup.merge, idents = c("Myeloid cells","Macrophages"))
+myeloid_cell_cluster <- subset(soup.merge, idents = c("Myeloid cells","DC_activated","DC_plasmacytoid"))
 
 myeloid_cell_cluster = RunPCA(myeloid_cell_cluster, assay = "SCT", npcs = 50)
 myeloid_cell_cluster = RunUMAP(myeloid_cell_cluster, assay = "SCT", reduction = "pca", dims = 1:50)
 ElbowPlot(myeloid_cell_cluster, ndims=50)
-myeloid_cell_cluster = FindNeighbors(myeloid_cell_cluster, dims = 1:6) %>% FindClusters(resolution = 0.2)
+myeloid_cell_cluster = FindNeighbors(myeloid_cell_cluster, dims = 1:10) %>% FindClusters(resolution = 0.3)
 
 DimPlot(myeloid_cell_cluster,
         group.by = "seurat_clusters",
         label = T
-        )
+)
 DimPlot(myeloid_cell_cluster,
         group.by = "sample_id",
         label = T
-        )
+)
 
 myeloid_cell_cluster = PrepSCTFindMarkers(myeloid_cell_cluster)
 myeloid.cell.markers = FindAllMarkers(myeloid_cell_cluster,only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25, verbose = T)
 myeloid.cell.markers %>%
-    group_by(cluster) %>%
-    top_n(n = 10, wt = avg_log2FC) -> top10
+  group_by(cluster) %>%
+  top_n(n = 10, wt = avg_log2FC) -> top10
 
-#0 - Macrophage_1
-FeaturePlot(myeloid_cell_cluster, c("APOE", "MARCO", "C1QA", "C1QB"), label = T)
-#1 - Monocytes
-FeaturePlot(myeloid_cell_cluster, c("VCAN","S100A8","CD300E"), label = T)
-#2 - Myeloid_mix
-#3 - Macrophage_2
-FeaturePlot(myeloid_cell_cluster, c("MARCO","SPP1"), label = T)
-#4 - DC_1
-FeaturePlot(myeloid_cell_cluster, c("WDFY4", "CLEC9A", "XCR1"), label = T)
 
-new.myeloid.cluster.ids <- c("Macrophage_1",
-                       "Monocytes",
-                       "Myeloid_mix",
-                       "Macrophage_2",
-                       "DC_1")
+#0 - Monocyte
+FeaturePlot(myeloid_cell_cluster, c('CD300E', 'S100A12', 'EREG', 'CD14', 
+                                    'FCGR3A', 'LILRB2', 'LILRB1', 'MTSS1', 'FAM110A', 
+                                    'LRRC25', 'CDKN1C', 'ABI3',"CD68"), label = T)
+#1 - DC_2
+FeaturePlot(myeloid_cell_cluster, c('CD1C',  'CLEC10A', 'FCER1A',"CD86", 
+                                    "FCER1G", "C1orf162", "CLEC7A", "HLA-DRB1", 
+                                    "FCGR2B", "SIRPA", "HLA-DRA"), label = T)
+#2 - Macrophage
+FeaturePlot(myeloid_cell_cluster, c('C1QA', 'C1QB', 'C1QC', 'APOE', 'APOC1'), label = T)
+#3 - Monocyte
+FeaturePlot(myeloid_cell_cluster, c(), label = T)
+#4 - Macrophage
+FeaturePlot(myeloid_cell_cluster, c('SPP1', 'PLA2G7',  'FOLR2', 'SLC1A3', 'CHIT1', 'PADI1','A2M',  'HTRA1'), label = T)
+#5 - Macrophage
+FeaturePlot(myeloid_cell_cluster, c('C1QA', 'C1QB', 'C1QC', 'APOE', 'APOC1',"MARCO"), label = T)
+#6 - plasmacytoid DCs
+FeaturePlot(myeloid_cell_cluster, c('CLEC4C',  'PLD4', 'JCHAIN'), label = T)
+#7 - activated DCs 
+FeaturePlot(myeloid_cell_cluster, c('CCR7', 'BIRC3', 'RASSF4', 'TRAF1', 'EBI3'), label = T)
+#8 - DC_1
+FeaturePlot(myeloid_cell_cluster, c('CLEC9A', 'XCR1', 'C1orf54', 'WDFY4', 'LGALS2', 'DNASE1L3'), label = T)
+
+new.myeloid.cluster.ids <- c("Monocyte",
+                             "DC_2",
+                             "Macrophage",
+                             "Monocyte",
+                             "Macrophage"
+                             "Macrophage",
+                             "DC_pc",
+                             "DC_activated",
+                             "DC_1")
 
 names(new.myeloid.cluster.ids) <- levels(myeloid_cell_cluster)
 myeloid_cell_cluster <- RenameIdents(myeloid_cell_cluster, new.myeloid.cluster.ids)
 DimPlot(myeloid_cell_cluster, label=T)
 myeloid_cell_cluster[["annot_m"]] <- Idents(myeloid_cell_cluster)
 
-soup.merge[["annot_l2"]] <- as.character(soup.merge@meta.data$annot_l2)
+soup.merge[["Level3"]] <- as.character(soup.merge@meta.data$Level3)
 for (i in colnames(myeloid_cell_cluster)) {
   if (i %in% rownames(soup.merge[["annot_l1"]])) {
-    soup.merge@meta.data[i,"annot_l2"] <- as.character(myeloid_cell_cluster@meta.data[i,"annot_m"])
+    soup.merge@meta.data[i,"Level3"] <- as.character(myeloid_cell_cluster@meta.data[i,"annot_m"])
   }
 }
-soup.merge@meta.data$annot_l2 <- as.factor(soup.merge@meta.data$annot_l2)
+soup.merge@meta.data$Level3 <- as.factor(soup.merge@meta.data$Level3)
 
-DimPlot(soup.merge, group.by = "Level3", label = T)
-FeaturePlot(soup.merge, c('MUC5AC', 'TSPAN8','CYP2F1', 'CEACAM5',  'VSIG2', 'FUT6'))
+# Add granularity to stroma cells
+myeloid_cell_cluster <- subset(soup.merge, idents = c("Myeloid cells","DC_activated","DC_plasmacytoid"))
+
+myeloid_cell_cluster = RunPCA(myeloid_cell_cluster, assay = "SCT", npcs = 50)
+myeloid_cell_cluster = RunUMAP(myeloid_cell_cluster, assay = "SCT", reduction = "pca", dims = 1:50)
+ElbowPlot(myeloid_cell_cluster, ndims=50)
+myeloid_cell_cluster = FindNeighbors(myeloid_cell_cluster, dims = 1:10) %>% FindClusters(resolution = 0.3)
+
+DimPlot(myeloid_cell_cluster,
+        group.by = "seurat_clusters",
+        label = T
+)
+DimPlot(myeloid_cell_cluster,
+        group.by = "sample_id",
+        label = T
+)
