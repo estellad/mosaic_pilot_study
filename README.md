@@ -12,10 +12,13 @@ To start with replicating our result, clone the repository to your working direc
 git clone https://github.com/bdsc-tds/mosaic_pilot_study.git
 ```
 
-The computational environment can be recreated by installing the singularity container from the .def file. 
+# Singularity container
+The computational environment can be recreated by installing the singularity container from the .def file. The R version we use for this workflow is 4.3.2, and renv is used to track specific versions of packages. Please find files related to renv in reproducibility/r/metadata, and use r.def in reproducibility/r to build the corresponding container:
 
 ``` bash
-singularity build --force --fakeroot /path/to/container/environment.sif /path/to/file/environment.def
+# Note: the current working directory is the root of this repo
+cd reproducibility/r
+singularity build --fakeroot --force /path/to/the/built/container r.def
 ```
 
 Launch the container from your terminal.
@@ -36,7 +39,7 @@ The folder structure of this repository is detailed as follow
             └── SuppFig
 ```
 
-The analysis for each technology should be run in sequential order based on the naming of files. For bash files, only scripts titled main_.sh should be submitted as jobs to high computing clusters. 
+The analysis for each technology should be run in sequential order based on the naming of files. For bash files, only scripts titled main_.sh should be submitted as jobs to high computing clusters. Note that path to container should be modified in _.sh files. 
 
 For visualization, the following code links are mapped to the creation of each figure/supplement figure. 
 
